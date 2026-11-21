@@ -136,7 +136,7 @@ Token claims follow the same contract as production: `sub`, `email`, `name`, `ro
 
 An in-process `TaxEngine` adapter (`tools/provider-sim`, registered as the engines `sim-avalara`, `sim-zamp`, `sim-taxually`) so development needs no provider accounts or internet:
 
-- **Rate tables in YAML** (`tools/provider-sim/rates/*.yaml`): country/state/county/city/ZIP → jurisdiction rates, product tax code taxability, exemptions. Ships with a small realistic sample (a few US states incl. a multi-jurisdiction ZIP, AU GST, UK VAT).
+- **Rate tables in YAML** (`tools/provider-sim/rates/*.yaml`): country/state/county/city/ZIP → jurisdiction rates, product tax code taxability, exemptions. Built from the simple countries in [tax-reference/](tax-reference/README.md) (AU, NZ, SG, JP, UK, US MI/IN). Expected results come from [tax-reference/test-scenarios.md](tax-reference/test-scenarios.md).
 - **Deterministic results**, so tests can assert exact cents.
 - **Disagreement knobs:** `sim-zamp` can be configured to differ from `sim-avalara` for chosen scopes, to exercise parallel calculation, comparison, triage and confidence locally.
 - **Fault injection:** latency, timeouts, 429 with `Retry-After`, 5xx, malformed responses, configurable per engine (`SIM_FAULTS=sim-avalara:timeout:10%`). Used to test retries, the circuit breaker and fallback.

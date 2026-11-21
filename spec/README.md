@@ -18,6 +18,7 @@ A client can **switch tax provider at any time** without changing their ERP setu
 | File | Purpose | Status |
 |---|---|---|
 | [01-workflow.md](01-workflow.md) | Core workflows: how a request flows through the gateway | Draft v0.1 |
+| [tax-reference/](tax-reference/README.md) | **Non-technical.** Simple-country tax pages (AU, NZ, SG, JP, UK, US MI/IN), shared test product categories, test scenarios with expected answers | Draft v0.1 |
 | [open-questions.md](open-questions.md) | Questions to answer before the next draft | Open |
 | [02-configuration.md](02-configuration.md) | Country-based onboarding, provider routing, cache config UI, tax change events, value dashboard | Draft v0.1 |
 | 03-domain-model.md | Canonical entities (Tenant, Transaction, Line, Address, ...) | Not started |
