@@ -1,6 +1,8 @@
 # 11 — Usage Metering (and Billing Roadmap)
 
-**Status:** Draft v0.1 · **Date:** 2026-11-21 · **Owner:** TSG
+**Status:** Draft v0.2 · **Date:** 2026-11-22 · **Owner:** TSG
+
+> **v0.2 (answers Q-02, Q-03, Q-04, Q-05):** the merchant pays TSG a **flat fee** for now. There's no licence check per call and no quota. Metering is still needed: it proves value and lets TSG compare flat with usage-based pricing (REQ-USE-10). Merchants use their own provider accounts, so TSG doesn't resell provider calls.
 
 **In scope now:** count every request each client sends, and every call to each calculator (who was asked, who answered, the outcome).
 **Not in scope now:** billing, meaning pricing, invoices and payments. It's a roadmap item (§7). The metering is designed so billing can be added later **without changing how usage is captured**.
@@ -159,7 +161,7 @@ Because metering is complete and immutable, any pricing model can be applied lat
 | Prepaid credits / drawdown | Buy 100k credits, consumed by usage |
 | Minimum commitment | $500/month minimum, usage counted against it |
 | Savings share | X% of provider cost saved by the cache / TSG engine (ties to Improved mode) |
-| Pass-through + margin | When TSG resells provider calls: provider cost + Y% |
+| Pass-through + margin | Only if TSG ever resells provider calls (not now: merchants use their own accounts, Q-03) |
 | Discounts, free trials, promos | Time-limited or volume-based |
 
 ### 7.3 Billable metric definitions (to decide later)
@@ -167,7 +169,7 @@ Because metering is complete and immutable, any pricing model can be applied lat
 The price plan references a **billable metric** defined over the usage counters, for example:
 - `committed_invoices` = request events with `action=COMMIT, outcome=SUCCESS`
 - `calculations` = `action=CALCULATE, outcome=SUCCESS`, excluding `DUPLICATE`
-- `provider_calls_resold` = engine call events with `providerBillable=true`, on a TSG master account
+- `provider_calls_resold` = engine call events with `providerBillable=true`, on a TSG master account (not used while merchants use their own accounts, Q-03)
 - Challenger calls and TSG-internal engines are **probably not billed** to clients (Q-93)
 
 ### 7.4 Build vs buy
@@ -178,7 +180,7 @@ Rather than building rating and invoicing, push the metered usage to a usage-bas
 
 | Phase | Delivers |
 |---|---|
-| **P1 (MVP)** | Usage events + counters, client and admin usage screens, CSV export, usage API |
+| **P1 (MVP)** | Usage events + counters, client and admin usage screens, CSV export, usage API. Flat pricing, so no rating (Q-05) |
 | **P2** | Provider reconciliation, anomaly alerts, soft limits |
 | **Billing phase (after P2, date TBC)** | Billable metrics, price plans, `BillingSink` to the chosen billing platform, hard quotas, client invoices |
 
@@ -188,3 +190,5 @@ Rather than building rating and invoicing, push the metered usage to a usage-bas
 > **REQ-USE-7** Usage can be broken down by any combination of: period (hour/day/month), action, engine, provider account, role, outcome, country/region, source connector, trigger mode.
 > **REQ-USE-8** Counters can be rebuilt from the raw events for any period, and the rebuild gives identical totals.
 > **REQ-USE-9** Metering works the same locally (in-process bus, MongoDB) as in the cloud ([10-local-development.md](10-local-development.md)).
+> **REQ-USE-10** TSG can show, per client and month, what the client would have paid under a sample usage-based plan (§7.2) next to the flat fee (Q-05). This uses re-rating of the metered usage, without billing.
+

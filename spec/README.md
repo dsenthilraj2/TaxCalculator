@@ -1,6 +1,8 @@
-# TSG Tax Gateway — Specification
+# Taxcart — Specification
 
-> Working name. Previously called "Taxcart" / "TSG Tax Calculator". To be confirmed (see Q-01).
+> Product name confirmed as **Taxcart** (Q-01). Internal code names (the `tsg_gateway` Python package, `TSG_` settings) stay as they are.
+
+**MVP:** US sales tax only, **Cin7 Omni → Zamp**, sales orders and invoices, onboarded and configured by TSG, read-only portal for merchants. See [impact-analysis-01.md](impact-analysis-01.md) for how the first answers shaped this.
 
 ## What this is
 
@@ -17,19 +19,21 @@ A client can **switch tax provider at any time** without changing their ERP setu
 
 | File | Purpose | Status |
 |---|---|---|
-| [01-workflow.md](01-workflow.md) | Core workflows: how a request flows through the gateway | Draft v0.1 |
-| [tax-reference/](tax-reference/README.md) | **Non-technical.** Simple-country tax pages (AU, NZ, SG, JP, UK, US MI/IN), shared test product categories, test scenarios with expected answers | Draft v0.1 |
-| [open-questions.md](open-questions.md) | Questions to answer before the next draft | Open |
-| [02-configuration.md](02-configuration.md) | Country-based onboarding, provider routing, cache config UI, tax change events, value dashboard | Draft v0.1 |
-| 03-domain-model.md | Canonical entities (Tenant, Transaction, Line, Address, ...) | Not started |
-| 04-connectors.md | Source connector framework and mapping | Not started |
+| [01-workflow.md](01-workflow.md) | Core workflows: how a request flows through Taxcart, the three checks on every document, provider-down behaviour | Draft v0.2 |
+| [tax-reference/](tax-reference/README.md) | **Non-technical.** US sales tax overview for the MVP, simple-country tax pages (AU, NZ, SG, JP, UK, US MI/IN), shared test product categories, test scenarios with expected answers | Draft v0.2 |
+| [open-questions.md](open-questions.md) | Questions to answer before the next draft. A–D answered; K holds follow-ups | Partly answered |
+| [impact-analysis-01.md](impact-analysis-01.md) | What the answers to Q-01–35 change in the spec and code | Applied to the spec (v0.2) |
+| [02-configuration.md](02-configuration.md) | Country-based onboarding (TSG-run), permissions, status mapping, tax code validation policy, provider routing, cache config UI, tax change events, value dashboard | Draft v0.2 |
+| 03-domain-model.md | Canonical entities (Tenant, Transaction, Line, Address, Customer, ...) | Not started |
+| [04-connectors.md](04-connectors.md) | Source connector contract and capabilities, Cin7 Omni (MVP) spike checklist | Draft v0.1 |
 | 05-providers.md | Tax provider adapter contract | Not started |
 | 06-tenancy-security.md | Tenants, users, roles, auth, isolation | Not started |
 | 07-portal-reporting.md | Customer portal and reports | Not started |
-| [08-architecture.md](08-architecture.md) | Python hexagonal architecture, document DB (MongoDB API), REST → queue evolution, serverless-first multi-cloud roadmap, React UI, Python standards | Draft v0.2 |
-| [09-roadmap.md](09-roadmap.md) | Parallel calculation (primary + challengers), comparison, evidence-based engine choice, phases | Draft v0.2 |
-| [10-local-development.md](10-local-development.md) | Cloud-free local stack (one MongoDB container), dev identity provider with personas, provider/ERP simulators, test levels, seed data | Draft v0.1 |
-| [11-usage-metering.md](11-usage-metering.md) | Requests per client, calls per calculator, who responded, usage screens; billing models kept as roadmap | Draft v0.1 |
+| [08-architecture.md](08-architecture.md) | Python hexagonal architecture, document DB (MongoDB API), REST → queue evolution, background jobs in the MVP, serverless-first multi-cloud roadmap, React UI, Python standards | Draft v0.3 |
+| [09-roadmap.md](09-roadmap.md) | Parallel calculation (primary + challengers), comparison, evidence-based engine choice, phases | Draft v0.3 |
+| [10-local-development.md](10-local-development.md) | Cloud-free local stack (local MongoDB), dev identity provider with personas, provider simulator (Zamp first), ERP simulator (Cin7 Omni first), test levels, seed data | Draft v0.2 |
+| [11-usage-metering.md](11-usage-metering.md) | Requests per client, calls per calculator, who responded, usage screens; flat pricing now, billing models kept as roadmap | Draft v0.2 |
+
 
 ## Conventions
 

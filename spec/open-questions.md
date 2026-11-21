@@ -123,3 +123,18 @@ Fill in **Answer** where you know it. Leave it blank or write "TBC — asking X"
 | Q-50 | Target date for MVP / first live client? (The Zamp deck said 8–12 weeks.) | Scope cut | |
 | Q-51 | Do we have sandbox accounts for Avalara, Zamp and the MVP ERPs? | Build and test | |
 | Q-52 | Team size and skills (.NET/React)? Is the stack in the 20 Nov spec fixed? | Architecture doc | |
+
+## K. Follow-ups from the first answers (see [impact-analysis-01.md](impact-analysis-01.md))
+
+| ID | Question | Why it matters | Answer |
+|---|---|---|---|
+| Q-100 ⭐ | Can the merchant admin edit anything (product tax setup, cache settings), or is the portal view-only for merchants in the MVP? (Raised by Q-15, Q-20, Q-25.) | Roles and which screens need edit modes | |
+| Q-101 | Is a **TSG consultant** a separate role from TSG admin (e.g. can configure clients but can't change global settings or switch providers)? | Roles (Q-15, Q-21) | |
+| Q-102 ⭐ | When the ERP's tax code differs from the client's product setup: use the ERP's code, use the setup's code, or hold the document for review? | Tax code validation (Q-16) | |
+| Q-103 ⭐ | Is W3 (void a committed invoice) in the MVP? Without it, an invoice cancelled in Cin7 Omni may still be filed in Zamp. | MVP workflow scope (Q-14) | |
+| Q-104 | Keep MFA for TSG admins in the MVP, even with email + password for merchants? TSG admins can see every client's data. | Security (Q-24) | |
+| Q-105 ⭐ | Which Zamp capabilities do we use: calculation only, or also address validation and exemption certificates? If Zamp doesn't offer one, which provider does it? | Every-document checks (Q-30) | |
+| Q-106 ⭐ | Does Cin7 Omni accept an externally calculated tax amount on sales orders and invoices through its API (line or document level)? Does it send webhooks, or must we poll? | Write-back and trigger mode (Q-12, Q-13) | |
+| Q-107 | Who provides the Cin7 Omni and Zamp sandbox accounts for building and testing? (Links to Q-51.) | Build and test | |
+| Q-108 | How often should stored addresses and exemption statuses be rechecked: on change only, daily, at certificate expiry? | Customer & address store (Q-30) | |
+| Q-109 | Are these answers implied by Q-03 correct? Q-40: reuse cuts the **merchant's** cost. Q-41: Zamp files, using the merchant's account. Q-42: no sharing of results across tenants. | Cache roadmap (W9) | |

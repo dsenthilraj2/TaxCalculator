@@ -34,6 +34,8 @@ So this folder describes taxes that are **simple enough to calculate with confid
 | Japan | Consumption tax | 10% / 8% | 2 | [japan.md](japan.md) |
 | United Kingdom | VAT | 20% / 5% / 0% | 2 | [united-kingdom.md](united-kingdom.md) |
 | United States: Michigan, Indiana | Sales tax | 6% · 7% (statewide, no local) | 2 | [us-simple-states.md](us-simple-states.md) |
+| **United States (MVP overview)** | Sales tax | State + local, by address | 3 | [united-states.md](united-states.md): what Taxcart must get right around Zamp's calculation, and MVP test situations |
+
 
 ## Plain-language glossary
 

@@ -1,6 +1,6 @@
 # 10 — Local Development & Testing
 
-**Status:** Draft v0.1 · **Date:** 2026-11-21 · **Owner:** TSG
+**Status:** Draft v0.2 · **Date:** 2026-11-22 · **Owner:** TSG
 
 ## 1. Goals
 
@@ -106,10 +106,10 @@ sequenceDiagram
 
 | Persona | Role | Tenant | Use for testing |
 |---|---|---|---|
-| `tsg.admin@dev.local` | `TsgAdmin` | all (can switch) | Global config, locks, promotion board, provisioning |
-| `tsg.analyst@dev.local` | `TsgAnalyst` | all (read + triage) | Mismatch triage, evidence |
-| `admin@acme.dev.local` | `ClientAdmin` | `acme` | Client config, cache UI, tax events, users |
-| `user@acme.dev.local` | `ClientUser` | `acme` | Read-only portal |
+| `tsg.admin@dev.local` | `TsgAdmin` | all (can switch) | Onboarding, configuration, provider switch, global config, locks, promotion board |
+| `tsg.analyst@dev.local` | `TsgAnalyst` | all (read + triage) | Mismatch triage, evidence. Becomes the TSG consultant persona if Q-101 adds that role |
+| `admin@acme.dev.local` | `ClientAdmin` | `acme` | Merchant admin: read-only transactions (Q-20). Edit rights depend on Q-100 |
+| `user@acme.dev.local` | `ClientUser` | `acme` | Read-only portal (kept for later; not an MVP role) |
 | `admin@beta.dev.local` | `ClientAdmin` | `beta` | **Tenant isolation**: must never see Acme data |
 | `locked@acme.dev.local` | `ClientUser` (disabled) | `acme` | Rejected-login and disabled-user paths |
 
@@ -134,9 +134,11 @@ Token claims follow the same contract as production: `sub`, `email`, `name`, `ro
 
 ## 5. Provider simulator
 
-An in-process `TaxEngine` adapter (`tools/provider-sim`, registered as the engines `sim-avalara`, `sim-zamp`, `sim-taxually`) so development needs no provider accounts or internet:
+An in-process `TaxEngine` adapter (`tools/provider-sim`) so development needs no provider accounts or internet. **`sim-zamp` comes first**, since Zamp is the only MVP provider (Q-06). `sim-avalara` and `sim-taxually` follow when they're needed (for parallel calculation and the UK).
 
-- **Rate tables in YAML** (`tools/provider-sim/rates/*.yaml`): country/state/county/city/ZIP → jurisdiction rates, product tax code taxability, exemptions. Built from the simple countries in [tax-reference/](tax-reference/README.md) (AU, NZ, SG, JP, UK, US MI/IN). Expected results come from [tax-reference/test-scenarios.md](tax-reference/test-scenarios.md).
+- **Zamp-shaped API:** calculate, commit, void, and address validation and exemption checks if Zamp offers them (Q-105), so the real Zamp adapter is tested against the simulator first.
+- **Rate tables in YAML** (`tools/provider-sim/rates/*.yaml`): state/county/city/special district/ZIP → jurisdiction rates, product tax code taxability, exemptions. Built from [tax-reference/united-states.md](tax-reference/united-states.md) for the MVP, plus the simple countries in [tax-reference/](tax-reference/README.md) (AU, NZ, SG, JP, UK, US MI/IN). Expected results come from [tax-reference/test-scenarios.md](tax-reference/test-scenarios.md).
+- **Customers and addresses:** seeded exempt customers (with certificate expiry dates) and addresses that fail validation or resolve to several jurisdictions, to test the customer & address store.
 - **Deterministic results**, so tests can assert exact cents.
 - **Disagreement knobs:** `sim-zamp` can be configured to differ from `sim-avalara` for chosen scopes, to exercise parallel calculation, comparison, triage and confidence locally.
 - **Fault injection:** latency, timeouts, 429 with `Retry-After`, 5xx, malformed responses, configurable per engine (`SIM_FAULTS=sim-avalara:timeout:10%`). Used to test retries, the circuit breaker and fallback.
@@ -154,7 +156,7 @@ An in-process `TaxEngine` adapter (`tools/provider-sim`, registered as the engin
 | `erp-sim serve --port 8090` | A fake ERP API that the **polling** connector can pull from, and that receives **write-back** calls (logged and inspectable at `/inspect`) |
 | `erp-sim load --tenant acme --rate 20/s --duration 60s` | Simple local load test |
 
-Samples (`tools/erp-sim/samples/`) are canonical-looking ERP payloads per connector (Cin7 Core, Acumatica) taken from sandbox recordings with personal data scrubbed.
+Samples (`tools/erp-sim/samples/`) are ERP payloads per connector, **Cin7 Omni first** (Q-10), taken from sandbox recordings with personal data scrubbed. The fake ERP API also simulates write-back rejections (REQ-WF-11) and the per-client status → action mapping (Q-15).
 
 ## 7. Testing strategy (all local, no cloud)
 
@@ -189,11 +191,12 @@ Samples (`tools/erp-sim/samples/`) are canonical-looking ERP payloads per connec
 
 | Data | Content |
 |---|---|
-| Tenants | `acme` (US + AU, Live mode, cache on), `beta` (US only, Improved mode) |
+| Tenants | `acme` (US, Cin7 Omni, `sim-zamp`), `beta` (US + AU, for multi-country tests) |
 | Users | The personas in §4.2 |
 | Config | Global defaults, a TSG lock (cache off for CA), an active Tax Change Event (UK), country templates |
-| Provider routes | Acme US → `sim-avalara` primary, `sim-zamp` challenger. Acme AU → TSG rules. |
-| Master data | ~50 products with tax codes, 2 warehouses, ~20 customers (some exempt) |
+| Provider routes | Acme US → `sim-zamp`. Beta AU → TSG rules. Challengers come with P2. |
+| Master data | ~50 products with expected tax codes (some deliberately different from the ERP's, for tax code exceptions), 1 warehouse per client (Q-17), ~20 customers with customer code and tax ID (some exempt, one with an expired certificate) |
+
 | Transactions | ~500 historical orders/invoices across states, including failed, voided and refunded ones, with comparison data so dashboards aren't empty |
 | API keys | One per connector instance, printed to the console |
 

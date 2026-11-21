@@ -1,6 +1,6 @@
 # 09 — Parallel Calculation, Evidence & Roadmap
 
-**Status:** Draft v0.2 · **Date:** 2026-11-21 · **Owner:** TSG
+**Status:** Draft v0.3 · **Date:** 2026-11-22 · **Owner:** TSG
 
 ## 1. Principle: prove it, don't assume it
 
@@ -135,12 +135,15 @@ The client still chooses **Live** or **Improved** per country ([02-configuration
 
 | Phase | Delivers |
 |---|---|
-| **P1 — Gateway MVP** | Connectors (1–2 ERPs), Avalara + Zamp adapters, W1–W8, portal, country onboarding. **`CalculationRun` stores every primary result from day 1.** **Usage metering** per client and per calculator ([11-usage-metering.md](11-usage-metering.md)). |
+| **P1 — Taxcart MVP** | **US sales tax only.** **Cin7 Omni** connector with write-back, **Zamp** adapter (merchant's own account). Sales orders (W1) and invoices (W2), plus W3 void if confirmed (Q-103). Exemption and address checks on every document with the customer & address store (W5, W6), tax code validation (W7), provider switch by TSG admin (W8). Automatic retry when Zamp is down. TSG-only onboarding, read-only merchant portal. **`CalculationRun` stores every primary result from day 1.** **Usage metering** per client and per calculator ([11-usage-metering.md](11-usage-metering.md)). |
+| **P1.5 — More documents** | Credit notes (W4) and quotes (Q-14). Line-level ship-from (Q-17). |
 | **P2 — Cache + parallel framework** | Challenger queue, comparison engine, the TSG cache as the first challenger, cache UI, tax change events, evidence dashboard |
 | **P3 — TSG rules engine as challenger** | Rules for flat-rate countries and single-rate states run on every request. Mismatch triage. Optional second-provider sampling. |
 | **P4 — Evidence-based switching** | Confidence scores, promotion board, Improved mode with a TSG primary where proven, automatic fallback |
 | **Billing** (after P2, date TBC) | Billable metrics, price plans (per transaction, allowance + overage, tiers, blocks, subscription, savings share...), push to a billing platform, hard quotas. See [11-usage-metering.md](11-usage-metering.md) §7. |
-| **P5 — Broaden** | More regions and product rules, licensed rate data (Q-45), commits from a TSG primary if approved (Q-71) |
+| **P5 — Broaden** | More countries and providers: Taxually (UK), 1StopVAT (EU) (Q-23). More ERPs. More product rules, licensed rate data (Q-45), commits from a TSG primary if approved (Q-71) |
+
+**Provider down (Q-35):** in the MVP Taxcart tells the user and retries later. From P4, where a Taxcart engine is proven for a scope, it can **suggest** Taxcart rates while the provider is unavailable. This is one more reason to collect evidence from day 1.
 
 ## 9. Where we expect evidence first
 
@@ -148,7 +151,8 @@ Expectations only. The data decides:
 
 | Scope | Expectation |
 |---|---|
-| AU / NZ / SG (flat-rate GST) | High agreement quickly |
-| US single-rate states with no local tax | High agreement |
+| US single-rate states with no local tax | High agreement. **First candidates**, since the MVP is US only (Q-06) |
+| AU / NZ / SG (flat-rate GST) | High agreement quickly, once those countries are added |
+
 | Repeat destinations (cache) | High agreement until rates change |
 | Complex US local jurisdictions (CO, LA, AL, AZ) | Low agreement for a long time. Provider stays primary. |

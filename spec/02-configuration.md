@@ -1,6 +1,8 @@
 # 02 — Configuration
 
-**Status:** Draft v0.1 · **Date:** 2026-11-21 · **Owner:** TSG
+**Status:** Draft v0.2 · **Date:** 2026-11-22 · **Owner:** TSG
+
+> **v0.2 (answers Q-15, Q-20, Q-21, Q-25):** TSG onboards and configures every client. Merchant admins view. The MVP is US only with Zamp (Q-06), so onboarding offers one country and one provider for now, but the design below is kept for the countries that follow (Q-23).
 
 Configuration is the product's main advantage. One gateway, set up per client and per country, means:
 - the right calculator for each country,
@@ -25,20 +27,24 @@ This document covers **what can be configured, by whom, at what level, and throu
 
 ## 2. Who configures what
 
-| Area | TSG admin | Client admin | Client user |
-|---|---|---|---|
-| Provider catalogue & capability matrix (§5) | Edit | View | — |
-| Global defaults & kill switches | Edit | — | — |
-| Client onboarding / country setup (§4) | Edit | Edit (if self-service, Q-25) | View |
-| Provider per country & capability (§6) | Edit | Edit or request (Q-21) | View |
-| Provider credentials | Edit | Edit | — |
-| Connector setup & document/status mapping | Edit | View | — |
-| Product tax code mapping | Edit | Edit | View |
-| Cache policy (§7) | Edit + **lock** | Edit within locks | View |
-| Tax change events (§8) | Create global/any client | Create for own client | View |
-| Cache purge | Any client | Own client | — |
-| Value & savings dashboard (§9) | All clients | Own client | Own client |
-| Audit log | All | Own client | — |
+| Area | TSG admin | Merchant admin |
+|---|---|---|
+| Provider catalogue & capability matrix (§5) | Edit | View |
+| Global defaults & kill switches | Edit | — |
+| Client onboarding / country setup (§4) | Edit (TSG onboards every client, Q-25) | View |
+| Provider per country & capability (§6) | Edit (Q-21) | View |
+| Provider credentials (the merchant's own account, Q-03) | Edit | — |
+| Connector setup & document/status mapping (§4.1) | Edit (Q-15) | View |
+| Product tax code mapping | Edit | View (edit: Q-100) |
+| Tax code validation policy (§4.2) | Edit | View |
+| Cache policy (§7) | Edit + **lock** | View (edit within locks: Q-46, Q-100) |
+| Tax change events (§8) | Create global/any client | View (create: Q-62) |
+| Cache purge | Any client | — (Q-100) |
+| Transactions, tax code exceptions | All clients | Own client, **read-only** (Q-20) |
+| Value & savings dashboard (§9) | All clients | Own client |
+| Audit log | All | Own client |
+
+The merchant's own customers have no portal access (Q-20). A **TSG consultant** role (configures clients, but can't change global settings or switch providers) is open (Q-101). Until then, "TSG admin" above covers both.
 
 **Locks:** a TSG admin can lock any setting at any level, for example *"cache must stay OFF for Brazil for all clients"*. A locked setting shows a padlock and the reason in the client UI, and can't be overridden below that level.
 
@@ -63,7 +69,7 @@ Priority (highest first):
 
 ## 4. Client onboarding — country-based setup
 
-Clients are set up **by country**, because each country has a different tax type, rules and suitable calculators. The onboarding wizard:
+Clients are set up **by country**, because each country has a different tax type, rules and suitable calculators. The onboarding wizard is a **TSG admin screen**; merchants don't self-onboard (Q-25). In the MVP the only country is the US and the only provider is Zamp (Q-06). The wizard:
 
 ```mermaid
 flowchart LR
@@ -82,9 +88,9 @@ flowchart LR
 | 1. Business profile | Legal name, home country, base currency, industry, B2B/B2C mix, marketplace seller? | Suggests typical exemptions (B2B resale) and marketplace facilitator rules |
 | 2. Countries | Countries the client **ships to** and the countries where it is **registered** (nexus / VAT / GST) | Calculates only where registered. Elsewhere returns zero tax with the reason "not registered". |
 | 3. Per-country tax setup | Tax type (Sales & Use, VAT, GST, IOSS/OSS), registration numbers, states/provinces with nexus, filing frequency, prices tax-inclusive or exclusive | Correct calculation mode per country. Warns about missing registrations. |
-| 4. Calculator per country | Provider for each capability (calculate, address validation, exemption, filing) chosen from providers **certified for that country** (§5) | Stops a client using a calculator that was never designed for that country |
-| 5. Source systems | ERP/eCommerce connectors, trigger mode, document types, status mapping | — |
-| 6. Products & tax codes | SKU/category → product tax code mapping, import from CSV | Flags unmapped products before go-live |
+| 4. Calculator per country | Provider for each capability (calculate, address validation, exemption, filing) chosen from providers **certified for that country** (§5). The **merchant's own provider account** is connected here (Q-03) and checked with a test call. | Stops a client using a calculator that was never designed for that country |
+| 5. Source systems | ERP/eCommerce connector, trigger mode (REQ-WF-10), write-back check, document types, **status → action mapping** (§4.1) | Confirms write-back works before go-live (REQ-WF-11) |
+| 6. Products & tax codes | The **expected** SKU/category → product tax code mapping, imported from the ERP or CSV, and the validation policy (§4.2) | Flags unmapped products and ERP codes that disagree before go-live |
 | 7. Locations | Warehouses / ship-from addresses with address validation | Correct origin-based calculation |
 | 8. Cache policy | Start from a country template (§7.3), or leave off | Savings estimate shown before it's enabled |
 | 9. Readiness report | Green/amber/red per country: provider certified, registrations, tax codes mapped, test calculation passed | Go-live checklist and a sales asset |
@@ -93,18 +99,43 @@ flowchart LR
 > **REQ-CFG-9** Adding a country later runs steps 3–4 and 8–9 for that country only.
 > **REQ-CFG-10** The wizard runs a **test calculation** per country against the chosen provider's sandbox before go-live.
 
+### 4.1 Status → action mapping (Q-15)
+
+Each ERP uses different document statuses, so TSG consultants set, per client, which status triggers which action:
+
+| Source | Document type | Status | Action |
+|---|---|---|---|
+| Cin7 Omni | Sales order | *(e.g. Approved, to confirm)* | W1 estimate |
+| Cin7 Omni | Invoice | Posted | W2 commit |
+| Cin7 Omni | Invoice | *(e.g. Void, to confirm)* | W3 void (Q-103) |
+
+> **REQ-CFG-21** The status → action mapping is configured per client and source by TSG admins, with effective dating and audit (REQ-CFG-3, REQ-CFG-4). A status with no mapping is ignored (transaction state *Ignored*).
+
+### 4.2 Tax code validation policy (Q-16)
+
+The ERP's tax code on each line is compared with the client's expected mapping (01-workflow W7).
+
+| Setting | Values | Default |
+|---|---|---|
+| `onMismatch` | `USE_ERP_CODE` · `USE_SETUP_CODE` · `HOLD_FOR_REVIEW` | To decide (Q-102) |
+| `onUnknownProduct` | `USE_ERP_CODE` · `HOLD_FOR_REVIEW` | `USE_ERP_CODE` |
+| `notify` | Exceptions digest to TSG and/or the merchant | TSG only |
+
+> **REQ-CFG-22** The validation policy is set per client (and optionally per country). Every exception is listed in the tax code exceptions view, whatever the policy.
+
 ## 5. Provider catalogue & capability matrix (TSG maintained)
 
 A TSG-maintained table of **which provider supports which country and capability**. It drives the onboarding choices and the routing.
 
 | Provider | Country/region | Calculate | Address validation | Exemption | Filing | IOSS/OSS | Duties/landed cost | Certified by TSG |
 |---|---|---|---|---|---|---|---|---|
-| Avalara | US | ✅ | ✅ | ✅ | ✅ | — | ✅ | ✅ |
-| Zamp | US | ✅ | ✅ | ✅ | ✅ | — | — | ✅ |
-| Taxually | UK / EU | ✅ VAT | — | — | ✅ | ✅ | — | ☐ |
+| **Zamp (MVP)** | US | ✅ | ? (Q-105) | ? (Q-105) | ✅ | — | — | ☐ |
+| Avalara | US | ✅ | ✅ | ✅ | ✅ | — | ✅ | ☐ |
+| Taxually | UK | ✅ VAT | — | — | ✅ | — | — | ☐ |
+| 1StopVAT | EU | ✅ VAT | — | — | ✅ | ✅ | — | ☐ |
 | ... | | | | | | | | |
 
-*(Values are illustrative and must be verified per provider.)*
+*(Values are illustrative and must be verified per provider. Q-23 names Zamp for the US, Taxually for the UK and 1StopVAT for the EU.)*
 
 > **REQ-CFG-11** A provider can only be assigned to a client + country + capability where the matrix says it's supported **and** TSG-certified. TSG admins can override this with a recorded reason.
 > **REQ-CFG-12** If the matrix changes (a provider drops a country), affected clients are listed and alerted.
@@ -116,11 +147,12 @@ A client can use different calculators in different countries, and a different p
 
 | Client: Acme Pty Ltd | Calculate | Address validation | Exemption | Effective from |
 |---|---|---|---|---|
-| United States | Zamp | Avalara | Zamp | 2026-12-01 |
+| United States | Zamp | Zamp? (Q-105) | Zamp? (Q-105) | 2026-12-01 |
 | United Kingdom | Taxually | — | — | 2027-01-01 |
+| European Union | 1StopVAT | — | — | 2027-04-01 |
 | Australia | *Internal GST rule (10%)?* see Q-63 | — | — | |
 
-Switching a provider is a scheduled, effective-dated change. The switch rules are in 01-workflow W8.
+Switching a provider is a scheduled, effective-dated change made by a TSG admin, from a chosen date (Q-21, Q-22). The switch rules are in 01-workflow W8.
 
 ## 7. Cache configuration
 
@@ -186,7 +218,7 @@ When tax law changes, or might change, the gateway must **stop trusting the cach
 | Period | Start date/time → end date/time (or open-ended, reviewed later) |
 | Action | `FORCE_LIVE` (bypass the cache), `PURGE_ON_START`, `PURGE_ON_END` |
 | Notify | Affected clients (banner + email) |
-| Created by | TSG admin (any scope) or client admin (own client only) |
+| Created by | TSG admin (any scope). Client admins for their own client only if Q-62 allows it |
 
 ```mermaid
 timeline
@@ -220,6 +252,7 @@ The same data that drives configuration shows *why the client should use this pr
 
 > **REQ-CFG-19** At onboarding, show a **projected savings estimate** from the client's expected volume, destinations and country templates.
 > **REQ-CFG-20** TSG admins can export a client's value report (PDF) for account reviews and sales.
+> **REQ-CFG-23** Pricing is flat for now (Q-05). The value report also shows **what the client would have paid under usage-based pricing**, from the metered requests ([11-usage-metering.md](11-usage-metering.md)), as proof for future pricing decisions.
 
 ## 10. Calculation mode (Live / Improved)
 
@@ -247,6 +280,10 @@ Details in 03-domain-model.md.
 | Entity | Key fields |
 |---|---|
 | `ProviderCapability` | ProviderId, Country, Capability, Certified, CostPerCall |
+| `ProviderAccount` | TenantId, ProviderId, credential reference (Key Vault), Environment (sandbox/production), LastTestedAt. The merchant's own account (Q-03) |
+| `StatusMapping` | TenantId, SourceSystem, DocumentType, SourceStatus, Action, EffectiveFrom/To |
+| `TaxCodeValidationPolicy` | TenantId, Country?, OnMismatch, OnUnknownProduct, Notify |
+
 | `ClientCountry` | TenantId, Country, Registered, TaxType, RegistrationNos, PricesIncludeTax, ReadinessStatus |
 | `ProviderRoute` | TenantId, Country, Capability, ProviderAccountId, EffectiveFrom/To |
 | `CachePolicy` | Scope (level + key), Settings, Locked, LockReason, EffectiveFrom/To |

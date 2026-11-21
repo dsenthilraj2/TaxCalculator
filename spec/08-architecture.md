@@ -1,8 +1,10 @@
 # 08 — Architecture
 
-**Status:** Draft v0.2 · **Date:** 2026-11-21 · **Owner:** TSG
+**Status:** Draft v0.3 · **Date:** 2026-11-22 · **Owner:** TSG
 
-This document is **architecture guidance**: how the gateway is built, how it runs cheaply at the start, and how it grows. Decisions marked **ADR-n** need sign-off.
+This document is **architecture guidance**: how Taxcart is built, how it runs cheaply at the start, and how it grows. Decisions marked **ADR-n** need sign-off.
+
+> **v0.3 (answers Q-06, Q-18, Q-20, Q-24, Q-30, Q-35):** the MVP is US only, Cin7 Omni → Zamp, at about 40–50 orders a day per client. That fits stage S0 easily. The MVP needs background jobs from day 1 (§6.2), not only REST. Roles and MFA are updated in §9.
 
 **Direction (from TSG):**
 - **Python** backend, following best practices (§10).
@@ -223,7 +225,8 @@ The repository layer gets the right database for each tenant from the **catalog*
 | | `tax_events` | `/scope` | Global Tax Change Events | — |
 | | `tsg_rules` | `/country` | TSG rules engine rates/rules (versioned) | — |
 | `tenant` (pooled or silo) | `tenant_config` | `/tenantId` | Countries, routes, cache policy, calc mode, connectors | — |
-| | `master_data` | `/tenantId` | Customers, items → tax codes, locations (`type` field) | — |
+| | `master_data` | `/tenantId` | Items → expected tax codes, locations (`type` field) | — |
+| | `customers` | `/tenantId` | Customer & address store (01-workflow, "Every document: three checks"): customer code, tax ID, exemption status, certificate reference and expiry, validated addresses with jurisdictions, `lastCheckedAt`, `nextCheckAt` | — |
 | | `transactions` | `/tenantId` | Canonical document + lines + primary result + status + **outbox** array | Archive after N years |
 | | `calculation_runs` | `/tenantId` | Every engine run (primary + challengers) with summary. Full payload in Blob. | e.g. 90 days → analytics store |
 | | `comparisons` | `/tenantId` | Diffs, pattern key, triage label | e.g. 90 days → analytics store |
@@ -292,6 +295,13 @@ flowchart LR
 
 > **REQ-ARC-4** Every handler is **idempotent** (idempotency key per command), because queues deliver at least once.
 > **REQ-ARC-5** Switching from Storage Queue to Service Bus or SQS is an adapter + configuration change, verified by the same contract test suite (`tests/contract/message_bus`).
+> **REQ-ARC-7** Phase A includes **background jobs from the MVP**, run by a timer or Storage Queue trigger:
+> - refresh the customer & address store (exemption and address checks, Q-30),
+> - retry documents in *PendingRetry* when the provider was down (Q-35),
+> - retry failed write-backs to the ERP,
+> - poll the ERP, if Cin7 Omni has no usable webhooks (Q-106).
+>
+> Locally they run in-process (or with `make` targets); the same handlers run under the cloud trigger.
 
 ### 6.3 Outbox without a relational DB
 
@@ -313,7 +323,7 @@ When a transaction is saved, the events to publish are written **in the same doc
 
 | Stage | Trigger | Compute | Database | Messaging | Cache | Est. monthly cost |
 |---|---|---|---|---|---|---|
-| **S0 MVP** | First clients | Azure Functions **Flex Consumption** (scale to zero) | Cosmos DB for MongoDB **serverless / free tier** | Storage Queue | In-memory + TTL docs | Very low (mostly free grants) |
+| **S0 MVP** | First clients (~40–50 orders/day each, Q-18) | Azure Functions **Flex Consumption** (scale to zero) | Cosmos DB for MongoDB **serverless / free tier** | Storage Queue | In-memory + TTL docs | Very low (mostly free grants) |
 | **S1 Growth** | Steady daily traffic, cold starts noticed | Flex Consumption + **always-ready instances** for the Gateway API | Cosmos DB **autoscale** | **Service Bus** Standard | Optional Redis (small) | Low |
 | **S2 Scale** | Sustained high volume (functions cost > containers) | **Azure Container Apps** (same image, KEDA scaling on queue length) | Cosmos autoscale / vCore, silo DBs for large tenants | Service Bus Premium if needed | Redis | Medium |
 | **S3 Multi-cloud** | A client or region needs AWS/GCP, or resilience | AWS Lambda/ECS, GCP Cloud Run | Atlas / DocumentDB | SQS / Pub/Sub | ElastiCache / Memorystore | Per deployment |
@@ -383,7 +393,7 @@ web/portal/src/
 
 | Area | Design |
 |---|---|
-| Portal users | OIDC (Authorization Code + PKCE). MFA required for admins. Roles: `TsgAdmin`, `TsgAnalyst`, `ClientAdmin`, `ClientUser`. |
+| Portal users | OIDC (Authorization Code + PKCE). **Email + password** for the MVP (Q-24). Proposed: MFA for TSG admins anyway, since they can see every client (Q-104). MVP roles: `TsgAdmin` (TSG staff, any client), `ClientAdmin` (merchant admin, own client, read-only transactions, Q-20). A TSG consultant role is open (Q-101). `TsgAnalyst` and `ClientUser` stay defined for later. The merchant's own customers have no access. |
 | ERP → Gateway | API key per connector instance (stored hashed, rotatable) or OAuth2 client credentials. Webhooks verified by HMAC + timestamp. |
 | Secrets | Provider/ERP credentials in Key Vault (per-tenant naming). Read with managed identity. Cached briefly in memory. Never logged. |
 | Network | HTTPS only. Private endpoints for DB/Storage/Key Vault from S1. WAF from S1. |
@@ -479,6 +489,8 @@ flowchart LR
 | Availability | Best effort, ~99.5% | 99.9% |
 | Async processing (webhook → write-back) | ≤ 5 min | ≤ 60 s |
 | Data retention | 7 years for transactions/raw (TBC Q-78) | Same |
+| Volume | ~40–50 orders/day per client (Q-18). About 4 provider calls per order (address, exemption, order, invoice), so ~200 calls/day per client | Grows with clients |
+
 | RPO / RTO | Cloud-native backups (Cosmos continuous backup), RTO ≤ 8 h | RPO ≤ 15 min, RTO ≤ 4 h |
 
 ## 13. Decisions summary
