@@ -43,12 +43,12 @@ Fill in **Answer** where you know it. Leave it blank or write "TBC — asking X"
 
 | ID | Question | Why it matters | Answer |
 |---|---|---|---|
-| Q-30 | Should address validation run automatically on every calculation, or only on demand? Should corrected addresses be written back to the ERP? | W5 | |
-| Q-31 | If the invoice tax differs from the order estimate, should we flag/alert it, or just use the invoice? | W2 | |
-| Q-32 | Exemption: write the exempt flag back to the ERP customer (as in the Cin7 doc), or only apply it at calculation time? | W6 | |
-| Q-33 | How are customers matched between the ERP and the provider (customer code, email, tax ID)? | W6, W7 | |
-| Q-34 | Multi-currency: do ERP documents come in non-USD currencies (the MYOB example was AUD) that need converting? Whose exchange rate? | Calculation inputs | |
-| Q-35 | If the provider is down, what should happen: block the ERP, return zero tax and recalculate later, or use the last known rate? | Failure workflow | |
+| Q-30 | Should address validation run automatically on every calculation, or only on demand? Should corrected addresses be written back to the ERP? | W5 | The three key elements on Sales tax calculation are Customer exemption certificate, Address validation and Tax calculation. These three elements should be validated / calculated on each call on each document. The first two can be asynchronous, if we can build that database in the server. |
+| Q-31 | If the invoice tax differs from the order estimate, should we flag/alert it, or just use the invoice? | W2 | Tax values on Sales Quotes and Orders are estimates only. Invoice is what IRS looks for. So Sales Invoice is very important and all three elements should be recalculated. |
+| Q-32 | Exemption: write the exempt flag back to the ERP customer (as in the Cin7 doc), or only apply it at calculation time? | W6 | Yes, possible on certain ERP systems |
+| Q-33 | How are customers matched between the ERP and the provider (customer code, email, tax ID)? | W6, W7 | Customer Code and Tax ID |
+| Q-34 | Multi-currency: do ERP documents come in non-USD currencies (the MYOB example was AUD) that need converting? Whose exchange rate? | Calculation inputs | For MVP and for most ERPs and customers, the currency will be USD for USA, EUR for Europe and GBP for UK.|
+| Q-35 | If the provider is down, what should happen: block the ERP, return zero tax and recalculate later, or use the last known rate? | Failure workflow | Inform User with a message and Recalculate later. This can change with the product roadmap, where we can suggest Taxcart rates |
 
 ## E. Tax reuse / cost cutting (roadmap)
 
