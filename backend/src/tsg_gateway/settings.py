@@ -5,6 +5,8 @@ from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from tsg_gateway.observability.logging import LogFormat
+
 
 class AppEnv(StrEnum):
     """Deployment environment."""
@@ -35,7 +37,11 @@ class Settings(BaseSettings):
 
     app_env: AppEnv = AppEnv.LOCAL
     cloud: Cloud = Cloud.LOCAL
+    service_name: str = "tsg-gateway"
     log_level: str = "INFO"
+    log_format: LogFormat = LogFormat.CONSOLE
+    host: str = "127.0.0.1"
+    port: int = 8000
 
 
 @lru_cache

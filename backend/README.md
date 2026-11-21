@@ -9,7 +9,24 @@ The design is in [../spec/08-architecture.md](../spec/08-architecture.md) and [.
 make setup    # from the repo root: installs Python 3.13 via uv, dependencies, pre-commit hooks
 make check    # ruff, mypy, import-linter
 make test     # unit + contract tests (no Docker needed)
+make run      # API on http://127.0.0.1:8000 (docs at /docs)
 ```
+
+## Endpoints so far
+
+| Path | Purpose |
+|---|---|
+| `GET /health` | Liveness: service, version, environment |
+| `GET /health/ready` | Readiness: runs dependency checks (none yet). `503` if any check fails or times out (2 s). |
+| `GET /docs` | Swagger UI (local/test/dev only) |
+
+Every response carries `X-Correlation-Id` (the caller's value if it's safe, otherwise a new one). Errors are RFC 9457 `application/problem+json` and include `correlationId`.
+
+## Logging
+
+- `TSG_LOG_FORMAT=console` (readable, local) or `json` (cloud). `TSG_LOG_LEVEL` sets the level.
+- One `request.completed` line per request (health checks only at DEBUG), with `correlation_id`, method, path, status and `duration_ms`.
+- Use `get_logger(__name__)` from `tsg_gateway.observability.logging`. Context values bound with `structlog.contextvars` appear on every line.
 
 ## Layout
 

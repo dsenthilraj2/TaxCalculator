@@ -2,7 +2,7 @@
 BACKEND := backend
 UV := uv --directory $(BACKEND)
 
-.PHONY: help setup sync lint format typecheck arch check test test-cov db down clean
+.PHONY: help setup sync run lint format typecheck arch check test test-cov db down clean
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-10s %s\n", $$1, $$2}'
@@ -15,6 +15,9 @@ setup: ## Install Python 3.13, dependencies and pre-commit hooks; create .env.lo
 
 sync: ## Install/update dependencies from uv.lock
 	$(UV) sync
+
+run: ## Run the API locally with reload (http://127.0.0.1:8000/docs)
+	$(UV) run tsg-api
 
 lint: ## Ruff lint and format check
 	$(UV) run ruff check .
