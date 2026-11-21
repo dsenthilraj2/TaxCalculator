@@ -66,12 +66,25 @@ PY
 }
 
 stop() {
-  if is_running; then
-    kill "$(cat "$PID_FILE")"
-    echo "MongoDB stopped"
-  else
+  if ! is_running; then
+    rm -f "$PID_FILE"
     echo "MongoDB not running"
+    return
   fi
+  local pid
+  pid="$(cat "$PID_FILE")"
+  # SIGTERM triggers a clean shutdown (flushes data, releases the lock file).
+  kill "$pid"
+  for _ in $(seq 30); do
+    kill -0 "$pid" 2>/dev/null || break
+    sleep 0.5
+  done
+  if kill -0 "$pid" 2>/dev/null; then
+    echo "MongoDB did not stop in 15s; forcing" >&2
+    kill -9 "$pid"
+  fi
+  rm -f "$PID_FILE"
+  echo "MongoDB stopped"
 }
 
 status() {

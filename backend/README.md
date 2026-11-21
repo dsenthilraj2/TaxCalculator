@@ -12,13 +12,22 @@ make test     # unit + contract tests (no Docker needed)
 make run      # API on http://127.0.0.1:8000 (docs at /docs)
 ```
 
-## Endpoints so far
+## Endpoints
 
 | Path | Purpose |
 |---|---|
-| `GET /health` | Liveness: service, version, environment |
-| `GET /health/ready` | Readiness: runs dependency checks (none yet). `503` if any check fails or times out (2 s). |
+| `GET /health`, `GET /health/ready` | Liveness; readiness (includes MongoDB ping) |
+| `GET /v1/tax-categories` | TSG tax categories |
+| `GET/PUT/DELETE /v1/products[/{sku}]`, `POST /v1/products/import` | Client products |
+| `GET/PUT/DELETE /v1/product-groups[/{group}]` | Product group → category mappings |
+| `GET/PUT /v1/tax-settings` | Client default category |
+| `POST /v1/tax-categories/resolve`, `GET /v1/tax-setup/summary` | Category lookup; setup counts |
+| `POST /v1/tax/calculate`, `GET /v1/tax/jurisdictions` | Sample calculator (TSG rules engine) |
+| `GET /v1/calculations/recent`, `GET /v1/usage/summary` | Recent activity; monthly usage |
+| `GET /v1/dev/tenants`, `GET /v1/dev/scenarios` | Dev only: demo clients; documented test scenarios |
 | `GET /docs` | Swagger UI (local/test/dev only) |
+
+Client endpoints need the `X-TSG-Tenant` header (local/test/dev only, until OIDC login).
 
 Every response carries `X-Correlation-Id` (the caller's value if it's safe, otherwise a new one). Errors are RFC 9457 `application/problem+json` and include `correlationId`.
 

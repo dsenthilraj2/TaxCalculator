@@ -1,0 +1,2251 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "TSG Tax Gateway",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Ready",
+        "operationId": "ready_health_ready_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadinessResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadinessResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tax-categories": {
+      "get": {
+        "tags": [
+          "tax setup"
+        ],
+        "summary": "List Tax Categories",
+        "operationId": "list_tax_categories_v1_tax_categories_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TaxCategory"
+                  },
+                  "type": "array",
+                  "title": "Response List Tax Categories V1 Tax Categories Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tax-categories/resolve": {
+      "post": {
+        "tags": [
+          "tax setup"
+        ],
+        "summary": "Resolve Tax Category",
+        "operationId": "resolve_tax_category_v1_tax_categories_resolve_post",
+        "parameters": [
+          {
+            "name": "X-TSG-Tenant",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tsg-Tenant"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResolvedCategory"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tax-setup/summary": {
+      "get": {
+        "tags": [
+          "tax setup"
+        ],
+        "summary": "Tax Setup Summary",
+        "operationId": "tax_setup_summary_v1_tax_setup_summary_get",
+        "parameters": [
+          {
+            "name": "X-TSG-Tenant",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tsg-Tenant"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetupSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tax-settings": {
+      "get": {
+        "tags": [
+          "tax setup"
+        ],
+        "summary": "Get Tax Settings",
+        "operationId": "get_tax_settings_v1_tax_settings_get",
+        "parameters": [
+          {
+            "name": "X-TSG-Tenant",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tsg-Tenant"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxSettings"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "tax setup"
+        ],
+        "summary": "Update Tax Settings",
+        "operationId": "update_tax_settings_v1_tax_settings_put",
+        "parameters": [
+          {
+            "name": "X-TSG-Tenant",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tsg-Tenant"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxSettings"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products": {
+      "get": {
+        "tags": [
+          "tax setup"
+        ],
+        "summary": "List Products",
+        "operationId": "list_products_v1_products_get",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "name": "tax_category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tax Category"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ProductStatus",
+              "default": "all"
+            }
+          },
+          {
+            "name": "X-TSG-Tenant",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tsg-Tenant"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductView"
+                  },
+                  "title": "Response List Products V1 Products Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/import": {
+      "post": {
+        "tags": [
+          "tax setup"
+        ],
+        "summary": "Import Products",
+        "operationId": "import_products_v1_products_import_post",
+        "parameters": [
+          {
+            "name": "X-TSG-Tenant",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tsg-Tenant"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Product"
+                },
+                "maxItems": 5000,
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/{sku}": {
+      "get": {
+        "tags": [
+          "tax setup"
+        ],
+        "summary": "Get Product",
+        "operationId": "get_product_v1_products__sku__get",
+        "parameters": [
+          {
+            "name": "sku",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sku"
+            }
+          },
+          {
+            "name": "X-TSG-Tenant",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tsg-Tenant"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "tax setup"
+        ],
+        "summary": "Put Product",
+        "operationId": "put_product_v1_products__sku__put",
+        "parameters": [
+          {
+            "name": "sku",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sku"
+            }
+          },
+          {
+            "name": "X-TSG-Tenant",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tsg-Tenant"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "tax setup"
+        ],
+        "summary": "Delete Product",
+        "operationId": "delete_product_v1_products__sku__delete",
+        "parameters": [
+          {
+            "name": "sku",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sku"
+            }
+          },
+          {
+            "name": "X-TSG-Tenant",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tsg-Tenant"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/product-groups": {
+      "get": {
+        "tags": [
+          "tax setup"
+        ],
+        "summary": "List Product Groups",
+        "operationId": "list_product_groups_v1_product_groups_get",
+        "parameters": [
+          {
+            "name": "X-TSG-Tenant",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tsg-Tenant"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupMapping"
+                  },
+                  "title": "Response List Product Groups V1 Product Groups Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/product-groups/{group}": {
+      "put": {
+        "tags": [
+          "tax setup"
+        ],
+        "summary": "Put Product Group",
+        "operationId": "put_product_group_v1_product_groups__group__put",
+        "parameters": [
+          {
+            "name": "group",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Group"
+            }
+          },
+          {
+            "name": "X-TSG-Tenant",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tsg-Tenant"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupMapping"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "tax setup"
+        ],
+        "summary": "Delete Product Group",
+        "operationId": "delete_product_group_v1_product_groups__group__delete",
+        "parameters": [
+          {
+            "name": "group",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Group"
+            }
+          },
+          {
+            "name": "X-TSG-Tenant",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tsg-Tenant"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tax/jurisdictions": {
+      "get": {
+        "tags": [
+          "tax"
+        ],
+        "summary": "List Jurisdictions",
+        "operationId": "list_jurisdictions_v1_tax_jurisdictions_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/JurisdictionInfo"
+                  },
+                  "type": "array",
+                  "title": "Response List Jurisdictions V1 Tax Jurisdictions Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tax/calculate": {
+      "post": {
+        "tags": [
+          "tax"
+        ],
+        "summary": "Calculate",
+        "operationId": "calculate_v1_tax_calculate_post",
+        "parameters": [
+          {
+            "name": "X-TSG-Tenant",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tsg-Tenant"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalculateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalculateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/calculations/recent": {
+      "get": {
+        "tags": [
+          "tax"
+        ],
+        "summary": "Recent Calculations",
+        "operationId": "recent_calculations_v1_calculations_recent_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 10,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "X-TSG-Tenant",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tsg-Tenant"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CalculationRecord"
+                  },
+                  "title": "Response Recent Calculations V1 Calculations Recent Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/usage/summary": {
+      "get": {
+        "tags": [
+          "tax"
+        ],
+        "summary": "Usage Summary",
+        "operationId": "usage_summary_v1_usage_summary_get",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^\\d{4}-\\d{2}$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Month"
+            }
+          },
+          {
+            "name": "X-TSG-Tenant",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tsg-Tenant"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/dev/tenants": {
+      "get": {
+        "tags": [
+          "tax",
+          "dev"
+        ],
+        "summary": "Dev Tenants",
+        "description": "Clients selectable in local/test/dev (until OIDC login).",
+        "operationId": "dev_tenants_v1_dev_tenants_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array",
+                  "title": "Response Dev Tenants V1 Dev Tenants Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/dev/scenarios": {
+      "get": {
+        "tags": [
+          "tax",
+          "dev"
+        ],
+        "summary": "Dev Scenarios",
+        "description": "Test scenarios from spec/tax-reference/test-scenarios.md, with expected results.",
+        "operationId": "dev_scenarios_v1_dev_scenarios_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": "array",
+                  "title": "Response Dev Scenarios V1 Dev Scenarios Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Address": {
+        "properties": {
+          "country": {
+            "type": "string",
+            "pattern": "^[A-Za-z]{2}$",
+            "title": "Country"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "postal_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Postal Code"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "country"
+        ],
+        "title": "Address",
+        "description": "A location. Only country (and region for some countries) affects the simple engine."
+      },
+      "CalculateLine": {
+        "properties": {
+          "line_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Id"
+          },
+          "sku": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sku"
+          },
+          "product_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Group"
+          },
+          "tax_category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tax Category"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Quantity",
+            "default": "1"
+          },
+          "unit_price": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Unit Price"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "unit_price"
+        ],
+        "title": "CalculateLine",
+        "description": "A sale line as sent by a client. Give a SKU, a product group or a tax category."
+      },
+      "CalculateRequest": {
+        "properties": {
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Za-z]{3}$",
+            "title": "Currency"
+          },
+          "prices_include_tax": {
+            "type": "boolean",
+            "title": "Prices Include Tax",
+            "default": false
+          },
+          "ship_from": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "ship_to": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/Customer",
+            "default": {
+              "exemption": "none"
+            }
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/CalculateLine"
+            },
+            "type": "array",
+            "maxItems": 500,
+            "minItems": 1,
+            "title": "Lines"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "currency",
+          "ship_from",
+          "ship_to",
+          "lines"
+        ],
+        "title": "CalculateRequest",
+        "description": "Calculate request body (``POST /v1/tax/calculate``)."
+      },
+      "CalculateResponse": {
+        "properties": {
+          "calculation_id": {
+            "type": "string",
+            "title": "Calculation Id"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "responded_by": {
+            "type": "string",
+            "title": "Responded By"
+          },
+          "rules_version": {
+            "type": "string",
+            "title": "Rules Version"
+          },
+          "jurisdiction": {
+            "type": "string",
+            "title": "Jurisdiction"
+          },
+          "jurisdiction_name": {
+            "type": "string",
+            "title": "Jurisdiction Name"
+          },
+          "tax_name": {
+            "type": "string",
+            "title": "Tax Name"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "prices_include_tax": {
+            "type": "boolean",
+            "title": "Prices Include Tax"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/CalculatedLine"
+            },
+            "type": "array",
+            "title": "Lines"
+          },
+          "net_total": {
+            "type": "string",
+            "title": "Net Total"
+          },
+          "tax_total": {
+            "type": "string",
+            "title": "Tax Total"
+          },
+          "gross_total": {
+            "type": "string",
+            "title": "Gross Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "calculation_id",
+          "reference",
+          "responded_by",
+          "rules_version",
+          "jurisdiction",
+          "jurisdiction_name",
+          "tax_name",
+          "currency",
+          "prices_include_tax",
+          "lines",
+          "net_total",
+          "tax_total",
+          "gross_total"
+        ],
+        "title": "CalculateResponse",
+        "description": "Calculate response body."
+      },
+      "CalculatedLine": {
+        "properties": {
+          "line_id": {
+            "type": "string",
+            "title": "Line Id"
+          },
+          "tax_category": {
+            "type": "string",
+            "title": "Tax Category"
+          },
+          "treatment": {
+            "$ref": "#/components/schemas/Treatment"
+          },
+          "rate": {
+            "type": "string",
+            "title": "Rate"
+          },
+          "net_amount": {
+            "type": "string",
+            "title": "Net Amount"
+          },
+          "tax_amount": {
+            "type": "string",
+            "title": "Tax Amount"
+          },
+          "gross_amount": {
+            "type": "string",
+            "title": "Gross Amount"
+          },
+          "sku": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sku"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "category_source": {
+            "$ref": "#/components/schemas/CategorySource"
+          }
+        },
+        "type": "object",
+        "required": [
+          "line_id",
+          "tax_category",
+          "treatment",
+          "rate",
+          "net_amount",
+          "tax_amount",
+          "gross_amount",
+          "sku",
+          "description",
+          "category_source"
+        ],
+        "title": "CalculatedLine",
+        "description": "A result line with where its category came from."
+      },
+      "CalculationRecord": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "tenant_id": {
+            "type": "string",
+            "title": "Tenant Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "engine": {
+            "type": "string",
+            "title": "Engine"
+          },
+          "jurisdiction": {
+            "type": "string",
+            "title": "Jurisdiction"
+          },
+          "jurisdiction_name": {
+            "type": "string",
+            "title": "Jurisdiction Name"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "line_count": {
+            "type": "integer",
+            "title": "Line Count"
+          },
+          "net_total": {
+            "type": "string",
+            "title": "Net Total"
+          },
+          "tax_total": {
+            "type": "string",
+            "title": "Tax Total"
+          },
+          "gross_total": {
+            "type": "string",
+            "title": "Gross Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "tenant_id",
+          "created_at",
+          "reference",
+          "engine",
+          "jurisdiction",
+          "jurisdiction_name",
+          "currency",
+          "line_count",
+          "net_total",
+          "tax_total",
+          "gross_total"
+        ],
+        "title": "CalculationRecord",
+        "description": "A successful calculation, kept for the recent-activity list."
+      },
+      "CategoryRate": {
+        "properties": {
+          "tax_category": {
+            "type": "string",
+            "title": "Tax Category"
+          },
+          "rate": {
+            "type": "string",
+            "title": "Rate"
+          },
+          "treatment": {
+            "$ref": "#/components/schemas/Treatment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tax_category",
+          "rate",
+          "treatment"
+        ],
+        "title": "CategoryRate",
+        "description": "How a jurisdiction treats one tax category."
+      },
+      "CategorySource": {
+        "type": "string",
+        "enum": [
+          "line",
+          "product",
+          "group",
+          "default"
+        ],
+        "title": "CategorySource",
+        "description": "Where a line's tax category came from, in lookup order."
+      },
+      "CheckResult": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "ok": {
+            "type": "boolean",
+            "title": "Ok"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "ok"
+        ],
+        "title": "CheckResult",
+        "description": "Outcome of one readiness check (for example, the database)."
+      },
+      "Customer": {
+        "properties": {
+          "customer_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Id"
+          },
+          "exemption": {
+            "$ref": "#/components/schemas/CustomerExemption",
+            "default": "none"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Customer",
+        "description": "The buyer."
+      },
+      "CustomerExemption": {
+        "type": "string",
+        "enum": [
+          "none",
+          "resale"
+        ],
+        "title": "CustomerExemption",
+        "description": "Customer-level exemption (US sales tax only)."
+      },
+      "DailyUsage": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "requests": {
+            "type": "integer",
+            "title": "Requests"
+          },
+          "successful": {
+            "type": "integer",
+            "title": "Successful"
+          }
+        },
+        "type": "object",
+        "required": [
+          "day",
+          "requests",
+          "successful"
+        ],
+        "title": "DailyUsage",
+        "description": "Requests on one day."
+      },
+      "EngineUsage": {
+        "properties": {
+          "engine": {
+            "type": "string",
+            "title": "Engine"
+          },
+          "requests": {
+            "type": "integer",
+            "title": "Requests"
+          },
+          "responded": {
+            "type": "integer",
+            "title": "Responded"
+          }
+        },
+        "type": "object",
+        "required": [
+          "engine",
+          "requests",
+          "responded"
+        ],
+        "title": "EngineUsage",
+        "description": "Requests handled by one engine."
+      },
+      "GroupInput": {
+        "properties": {
+          "tax_category": {
+            "type": "string",
+            "title": "Tax Category"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "tax_category"
+        ],
+        "title": "GroupInput",
+        "description": "Body for a group mapping (the group is in the path)."
+      },
+      "GroupMapping": {
+        "properties": {
+          "group": {
+            "type": "string",
+            "title": "Group"
+          },
+          "tax_category": {
+            "type": "string",
+            "title": "Tax Category"
+          }
+        },
+        "type": "object",
+        "required": [
+          "group",
+          "tax_category"
+        ],
+        "title": "GroupMapping",
+        "description": "Maps an ERP product group to a tax category. Every SKU in the group inherits it."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "ok",
+            "title": "Status"
+          },
+          "service": {
+            "type": "string",
+            "title": "Service"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "environment": {
+            "type": "string",
+            "title": "Environment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "service",
+          "version",
+          "environment"
+        ],
+        "title": "HealthResponse",
+        "description": "Liveness: the process is up and serving requests."
+      },
+      "ImportResult": {
+        "properties": {
+          "imported": {
+            "type": "integer",
+            "title": "Imported"
+          }
+        },
+        "type": "object",
+        "required": [
+          "imported"
+        ],
+        "title": "ImportResult",
+        "description": "Result of a bulk import."
+      },
+      "JurisdictionInfo": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "country": {
+            "type": "string",
+            "title": "Country"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "tax_name": {
+            "type": "string",
+            "title": "Tax Name"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "customer_exemptions": {
+            "type": "boolean",
+            "title": "Customer Exemptions"
+          },
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/CategoryRate"
+            },
+            "type": "array",
+            "title": "Categories",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "country",
+          "region",
+          "name",
+          "tax_name",
+          "currency",
+          "customer_exemptions"
+        ],
+        "title": "JurisdictionInfo",
+        "description": "A jurisdiction an engine can calculate."
+      },
+      "Product": {
+        "properties": {
+          "sku": {
+            "type": "string",
+            "title": "Sku"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Group"
+          },
+          "tax_category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tax Category"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sku",
+          "name"
+        ],
+        "title": "Product",
+        "description": "A product the client sells. ``tax_category`` set here overrides its group mapping."
+      },
+      "ProductInput": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Group"
+          },
+          "tax_category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tax Category"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "ProductInput",
+        "description": "Body for creating or replacing a product (the SKU is in the path)."
+      },
+      "ProductStatus": {
+        "type": "string",
+        "enum": [
+          "all",
+          "mapped",
+          "unmapped"
+        ],
+        "title": "ProductStatus",
+        "description": "Filter for the product list."
+      },
+      "ProductView": {
+        "properties": {
+          "sku": {
+            "type": "string",
+            "title": "Sku"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Group"
+          },
+          "tax_category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tax Category"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "resolved_category": {
+            "type": "string",
+            "title": "Resolved Category"
+          },
+          "category_source": {
+            "$ref": "#/components/schemas/CategorySource"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sku",
+          "name",
+          "resolved_category",
+          "category_source"
+        ],
+        "title": "ProductView",
+        "description": "A product with the category it would actually be taxed under."
+      },
+      "ReadinessResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "not_ready"
+            ],
+            "title": "Status"
+          },
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/CheckResult"
+            },
+            "type": "array",
+            "title": "Checks"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "checks"
+        ],
+        "title": "ReadinessResponse",
+        "description": "Readiness: every dependency the app needs is reachable."
+      },
+      "ResolveInput": {
+        "properties": {
+          "sku": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sku"
+          },
+          "product_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Group"
+          },
+          "tax_category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tax Category"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ResolveInput",
+        "description": "Which category would a line with these details use?"
+      },
+      "ResolvedCategory": {
+        "properties": {
+          "tax_category": {
+            "type": "string",
+            "title": "Tax Category"
+          },
+          "source": {
+            "$ref": "#/components/schemas/CategorySource"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tax_category",
+          "source"
+        ],
+        "title": "ResolvedCategory",
+        "description": "The tax category used for a line and why."
+      },
+      "SettingsInput": {
+        "properties": {
+          "default_category": {
+            "type": "string",
+            "title": "Default Category"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "default_category"
+        ],
+        "title": "SettingsInput",
+        "description": "Body for tax settings."
+      },
+      "SetupSummary": {
+        "properties": {
+          "products_total": {
+            "type": "integer",
+            "title": "Products Total"
+          },
+          "products_by_product": {
+            "type": "integer",
+            "title": "Products By Product"
+          },
+          "products_by_group": {
+            "type": "integer",
+            "title": "Products By Group"
+          },
+          "products_by_default": {
+            "type": "integer",
+            "title": "Products By Default"
+          },
+          "groups_total": {
+            "type": "integer",
+            "title": "Groups Total"
+          },
+          "default_category": {
+            "type": "string",
+            "title": "Default Category"
+          }
+        },
+        "type": "object",
+        "required": [
+          "products_total",
+          "products_by_product",
+          "products_by_group",
+          "products_by_default",
+          "groups_total",
+          "default_category"
+        ],
+        "title": "SetupSummary",
+        "description": "Counts for the dashboard."
+      },
+      "TaxCategory": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "name",
+          "description"
+        ],
+        "title": "TaxCategory",
+        "description": "One TSG tax category."
+      },
+      "TaxSettings": {
+        "properties": {
+          "default_category": {
+            "type": "string",
+            "title": "Default Category",
+            "default": "TSG-GEN"
+          }
+        },
+        "type": "object",
+        "title": "TaxSettings",
+        "description": "Per-client tax setup settings."
+      },
+      "Treatment": {
+        "type": "string",
+        "enum": [
+          "standard",
+          "reduced",
+          "zero_rated",
+          "gst_free",
+          "exempt",
+          "input_taxed",
+          "not_taxable",
+          "export",
+          "exempt_customer"
+        ],
+        "title": "Treatment",
+        "description": "How a line was taxed."
+      },
+      "UsageSummary": {
+        "properties": {
+          "month": {
+            "type": "string",
+            "title": "Month"
+          },
+          "requests": {
+            "type": "integer",
+            "title": "Requests"
+          },
+          "successful": {
+            "type": "integer",
+            "title": "Successful"
+          },
+          "rejected": {
+            "type": "integer",
+            "title": "Rejected"
+          },
+          "unsupported": {
+            "type": "integer",
+            "title": "Unsupported"
+          },
+          "by_engine": {
+            "items": {
+              "$ref": "#/components/schemas/EngineUsage"
+            },
+            "type": "array",
+            "title": "By Engine"
+          },
+          "by_day": {
+            "items": {
+              "$ref": "#/components/schemas/DailyUsage"
+            },
+            "type": "array",
+            "title": "By Day"
+          }
+        },
+        "type": "object",
+        "required": [
+          "month",
+          "requests",
+          "successful",
+          "rejected",
+          "unsupported",
+          "by_engine",
+          "by_day"
+        ],
+        "title": "UsageSummary",
+        "description": "One month of usage for a client."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

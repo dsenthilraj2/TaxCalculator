@@ -2,7 +2,7 @@
 BACKEND := backend
 UV := uv --directory $(BACKEND)
 
-.PHONY: help setup sync run seed lint format typecheck arch check test test-cov test-int db db-stop db-docker down clean
+.PHONY: help setup sync run seed lint format typecheck arch check test test-cov test-int db db-stop db-docker down clean openapi web-install web web-check demo demo-stop
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-10s %s\n", $$1, $$2}'
@@ -62,3 +62,22 @@ down: ## Stop Docker containers
 clean: ## Remove caches and local data
 	rm -rf $(BACKEND)/.pytest_cache $(BACKEND)/.mypy_cache $(BACKEND)/.ruff_cache $(BACKEND)/.coverage .localdata
 	find $(BACKEND) -type d -name __pycache__ -prune -exec rm -rf {} +
+
+openapi: ## Export the OpenAPI spec and regenerate the UI's typed API client
+	$(UV) run python -c "import json; from tsg_gateway.entrypoints.api.app import create_app; from tsg_gateway.settings import Settings, Store; print(json.dumps(create_app(Settings(_env_file=None, store=Store.MEMORY, log_level='WARNING')).openapi(), indent=2))" > $(BACKEND)/openapi.json
+	cd web/portal && npx openapi-typescript ../../$(BACKEND)/openapi.json -o src/api/schema.d.ts
+
+web-install: ## Install UI dependencies
+	cd web/portal && npm ci
+
+web: ## Run the UI dev server (http://127.0.0.1:5173), proxies /v1 to the API
+	cd web/portal && npm run dev
+
+web-check: ## Type-check, lint and test the UI
+	cd web/portal && npx tsc -b && npm run lint && npx vitest run
+
+demo: ## Start MongoDB + API + UI for a demo (scripts/demo.sh start)
+	scripts/demo.sh start
+
+demo-stop: ## Stop the demo, including MongoDB
+	scripts/demo.sh stop
