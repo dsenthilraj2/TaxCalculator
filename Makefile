@@ -2,7 +2,7 @@
 BACKEND := backend
 UV := uv --directory $(BACKEND)
 
-.PHONY: help setup sync run lint format typecheck arch check test test-cov db down clean
+.PHONY: help setup sync run seed lint format typecheck arch check test test-cov test-int db db-stop db-docker down clean
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-10s %s\n", $$1, $$2}'
@@ -18,6 +18,9 @@ sync: ## Install/update dependencies from uv.lock
 
 run: ## Run the API locally with reload (http://127.0.0.1:8000/docs)
 	$(UV) run tsg-api
+
+seed: db ## Load demo products, group mappings and sample calculations
+	$(UV) run tsg-seed
 
 lint: ## Ruff lint and format check
 	$(UV) run ruff check .
@@ -41,10 +44,19 @@ test: ## Unit + contract tests (no Docker needed)
 test-cov: ## Tests with coverage report
 	$(UV) run pytest -m "not integration and not e2e" --cov --cov-report=term-missing
 
-db: ## Start local MongoDB (needs Docker)
+test-int: db ## All tests including MongoDB integration tests
+	$(UV) run pytest -m "not e2e"
+
+db: ## Start local MongoDB (downloads it on first run, no Docker/sudo needed)
+	scripts/mongodb.sh start
+
+db-stop: ## Stop local MongoDB
+	scripts/mongodb.sh stop
+
+db-docker: ## Alternative: MongoDB in Docker
 	docker compose up -d mongo
 
-down: ## Stop local containers
+down: ## Stop Docker containers
 	docker compose down
 
 clean: ## Remove caches and local data

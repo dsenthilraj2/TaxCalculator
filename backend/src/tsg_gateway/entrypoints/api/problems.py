@@ -14,6 +14,7 @@ def problem_response(
     status: int,
     *,
     detail: str | None = None,
+    problem_type: str = "about:blank",
     errors: list[dict[str, Any]] | None = None,
     headers: Mapping[str, str] | None = None,
 ) -> JSONResponse:
@@ -22,7 +23,7 @@ def problem_response(
     The current correlation ID is included so clients can quote it to support.
     """
     body: dict[str, Any] = {
-        "type": "about:blank",
+        "type": problem_type,
         "title": HTTPStatus(status).phrase,
         "status": status,
     }

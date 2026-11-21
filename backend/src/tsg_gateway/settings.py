@@ -25,6 +25,13 @@ class Cloud(StrEnum):
     AWS = "aws"
 
 
+class Store(StrEnum):
+    """Where data is kept."""
+
+    MEMORY = "memory"
+    MONGO = "mongo"
+
+
 class Settings(BaseSettings):
     """Settings shared by every entry point."""
 
@@ -42,6 +49,23 @@ class Settings(BaseSettings):
     log_format: LogFormat = LogFormat.CONSOLE
     host: str = "127.0.0.1"
     port: int = 8000
+
+    store: Store = Store.MONGO
+    mongo_uri: str = "mongodb://127.0.0.1:27017/?replicaSet=rs0&directConnection=true"
+    mongo_database: str = "tsg_local"
+
+    # Clients selectable with the X-TSG-Tenant header (local/test/dev only, until OIDC login).
+    dev_tenants: str = "acme,beta"
+
+    @property
+    def is_non_production(self) -> bool:
+        """True for environments where dev-only features may be enabled."""
+        return self.app_env in {AppEnv.LOCAL, AppEnv.TEST, AppEnv.DEV}
+
+    @property
+    def dev_tenant_ids(self) -> list[str]:
+        """Parsed ``dev_tenants``."""
+        return [tenant.strip() for tenant in self.dev_tenants.split(",") if tenant.strip()]
 
 
 @lru_cache

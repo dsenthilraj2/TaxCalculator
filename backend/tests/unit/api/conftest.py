@@ -6,12 +6,17 @@ from fastapi import FastAPI
 
 from tsg_gateway.entrypoints.api.app import create_app
 from tsg_gateway.observability.logging import LogFormat
-from tsg_gateway.settings import AppEnv, Settings
+from tsg_gateway.settings import AppEnv, Settings, Store
+
+ACME = {"X-TSG-Tenant": "acme"}
+BETA = {"X-TSG-Tenant": "beta"}
 
 
 @pytest.fixture
 def settings() -> Settings:
-    return Settings(_env_file=None, app_env=AppEnv.TEST, log_format=LogFormat.JSON)
+    return Settings(
+        _env_file=None, app_env=AppEnv.TEST, log_format=LogFormat.JSON, store=Store.MEMORY
+    )
 
 
 @pytest.fixture

@@ -1,0 +1,1256 @@
+[
+  {
+    "id": "AU-01",
+    "group": "Australia",
+    "title": "Basic 10%",
+    "request": {
+      "reference": "AU-01",
+      "currency": "AUD",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "AU",
+        "region": "NSW",
+        "city": "Sydney"
+      },
+      "ship_to": {
+        "country": "AU",
+        "city": "Melbourne",
+        "region": "VIC"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "100.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "10.00",
+      "gross_total": "110.00"
+    }
+  },
+  {
+    "id": "AU-02",
+    "group": "Australia",
+    "title": "Inclusive price",
+    "request": {
+      "reference": "AU-02",
+      "currency": "AUD",
+      "prices_include_tax": true,
+      "ship_from": {
+        "country": "AU",
+        "region": "NSW",
+        "city": "Sydney"
+      },
+      "ship_to": {
+        "country": "AU",
+        "city": "Melbourne",
+        "region": "VIC"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "110.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "10.00",
+      "gross_total": "110.00"
+    }
+  },
+  {
+    "id": "AU-03",
+    "group": "Australia",
+    "title": "Mixed basket (GST-free food)",
+    "request": {
+      "reference": "AU-03",
+      "currency": "AUD",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "AU",
+        "region": "NSW",
+        "city": "Sydney"
+      },
+      "ship_to": {
+        "country": "AU",
+        "city": "Brisbane",
+        "region": "QLD"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "50.00"
+        },
+        {
+          "tax_category": "TSG-FOOD",
+          "quantity": "1",
+          "unit_price": "20.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "5.00",
+      "gross_total": "75.00"
+    }
+  },
+  {
+    "id": "AU-04",
+    "group": "Australia",
+    "title": "Export is GST-free",
+    "request": {
+      "reference": "AU-04",
+      "currency": "AUD",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "AU",
+        "region": "NSW",
+        "city": "Sydney"
+      },
+      "ship_to": {
+        "country": "NZ",
+        "city": "Auckland"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "200.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "0.00",
+      "gross_total": "200.00"
+    }
+  },
+  {
+    "id": "AU-05",
+    "group": "Australia",
+    "title": "Rounding (exclusive)",
+    "request": {
+      "reference": "AU-05",
+      "currency": "AUD",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "AU",
+        "region": "NSW",
+        "city": "Sydney"
+      },
+      "ship_to": {
+        "country": "AU",
+        "city": "Perth",
+        "region": "WA"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "3",
+          "unit_price": "3.33"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "1.00",
+      "gross_total": "10.99"
+    }
+  },
+  {
+    "id": "AU-06",
+    "group": "Australia",
+    "title": "Rounding (inclusive)",
+    "request": {
+      "reference": "AU-06",
+      "currency": "AUD",
+      "prices_include_tax": true,
+      "ship_from": {
+        "country": "AU",
+        "region": "NSW",
+        "city": "Sydney"
+      },
+      "ship_to": {
+        "country": "AU",
+        "city": "Perth",
+        "region": "WA"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "9.99"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "0.91",
+      "gross_total": "9.99"
+    }
+  },
+  {
+    "id": "AU-07",
+    "group": "Australia",
+    "title": "Food exception (prepared food)",
+    "request": {
+      "reference": "AU-07",
+      "currency": "AUD",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "AU",
+        "region": "NSW",
+        "city": "Sydney"
+      },
+      "ship_to": {
+        "country": "AU",
+        "city": "Sydney",
+        "region": "NSW"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-FOOD-PREP",
+          "quantity": "1",
+          "unit_price": "30.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "3.00",
+      "gross_total": "33.00"
+    }
+  },
+  {
+    "id": "AU-08",
+    "group": "Australia",
+    "title": "Input-taxed financial",
+    "request": {
+      "reference": "AU-08",
+      "currency": "AUD",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "AU",
+        "region": "NSW",
+        "city": "Sydney"
+      },
+      "ship_to": {
+        "country": "AU",
+        "city": "Sydney",
+        "region": "NSW"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-FIN",
+          "quantity": "1",
+          "unit_price": "100.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "0.00",
+      "gross_total": "100.00"
+    }
+  },
+  {
+    "id": "NZ-01",
+    "group": "New Zealand",
+    "title": "Basic 15%",
+    "request": {
+      "reference": "NZ-01",
+      "currency": "NZD",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "NZ",
+        "city": "Auckland"
+      },
+      "ship_to": {
+        "country": "NZ",
+        "city": "Wellington"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "200.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "30.00",
+      "gross_total": "230.00"
+    }
+  },
+  {
+    "id": "NZ-02",
+    "group": "New Zealand",
+    "title": "Inclusive price",
+    "request": {
+      "reference": "NZ-02",
+      "currency": "NZD",
+      "prices_include_tax": true,
+      "ship_from": {
+        "country": "NZ",
+        "city": "Auckland"
+      },
+      "ship_to": {
+        "country": "NZ",
+        "city": "Wellington"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "230.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "30.00",
+      "gross_total": "230.00"
+    }
+  },
+  {
+    "id": "NZ-03",
+    "group": "New Zealand",
+    "title": "No food exemption",
+    "request": {
+      "reference": "NZ-03",
+      "currency": "NZD",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "NZ",
+        "city": "Auckland"
+      },
+      "ship_to": {
+        "country": "NZ",
+        "city": "Christchurch"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-FOOD",
+          "quantity": "1",
+          "unit_price": "40.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "6.00",
+      "gross_total": "46.00"
+    }
+  },
+  {
+    "id": "NZ-04",
+    "group": "New Zealand",
+    "title": "Exempt financial",
+    "request": {
+      "reference": "NZ-04",
+      "currency": "NZD",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "NZ",
+        "city": "Auckland"
+      },
+      "ship_to": {
+        "country": "NZ",
+        "city": "Wellington"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-FIN",
+          "quantity": "1",
+          "unit_price": "100.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "0.00",
+      "gross_total": "100.00"
+    }
+  },
+  {
+    "id": "SG-01",
+    "group": "Singapore",
+    "title": "Basic 9%",
+    "request": {
+      "reference": "SG-01",
+      "currency": "SGD",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "SG",
+        "city": "Singapore"
+      },
+      "ship_to": {
+        "country": "SG",
+        "city": "Singapore"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "100.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "9.00",
+      "gross_total": "109.00"
+    }
+  },
+  {
+    "id": "SG-02",
+    "group": "Singapore",
+    "title": "Inclusive price",
+    "request": {
+      "reference": "SG-02",
+      "currency": "SGD",
+      "prices_include_tax": true,
+      "ship_from": {
+        "country": "SG",
+        "city": "Singapore"
+      },
+      "ship_to": {
+        "country": "SG",
+        "city": "Singapore"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "109.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "9.00",
+      "gross_total": "109.00"
+    }
+  },
+  {
+    "id": "SG-03",
+    "group": "Singapore",
+    "title": "Exempt financial",
+    "request": {
+      "reference": "SG-03",
+      "currency": "SGD",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "SG",
+        "city": "Singapore"
+      },
+      "ship_to": {
+        "country": "SG",
+        "city": "Singapore"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-FIN",
+          "quantity": "1",
+          "unit_price": "100.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "0.00",
+      "gross_total": "100.00"
+    }
+  },
+  {
+    "id": "JP-01",
+    "group": "Japan",
+    "title": "Standard 10%",
+    "request": {
+      "reference": "JP-01",
+      "currency": "JPY",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "JP",
+        "city": "Tokyo"
+      },
+      "ship_to": {
+        "country": "JP",
+        "city": "Osaka"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "1000"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "100",
+      "gross_total": "1100"
+    }
+  },
+  {
+    "id": "JP-02",
+    "group": "Japan",
+    "title": "Reduced 8%",
+    "request": {
+      "reference": "JP-02",
+      "currency": "JPY",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "JP",
+        "city": "Tokyo"
+      },
+      "ship_to": {
+        "country": "JP",
+        "city": "Osaka"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-FOOD",
+          "quantity": "1",
+          "unit_price": "1000"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "80",
+      "gross_total": "1080"
+    }
+  },
+  {
+    "id": "JP-03",
+    "group": "Japan",
+    "title": "Two rates on one invoice",
+    "request": {
+      "reference": "JP-03",
+      "currency": "JPY",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "JP",
+        "city": "Tokyo"
+      },
+      "ship_to": {
+        "country": "JP",
+        "city": "Osaka"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "1000"
+        },
+        {
+          "tax_category": "TSG-FOOD",
+          "quantity": "1",
+          "unit_price": "1000"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "180",
+      "gross_total": "2180"
+    }
+  },
+  {
+    "id": "JP-04",
+    "group": "Japan",
+    "title": "Round down",
+    "request": {
+      "reference": "JP-04",
+      "currency": "JPY",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "JP",
+        "city": "Tokyo"
+      },
+      "ship_to": {
+        "country": "JP",
+        "city": "Kyoto"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-FOOD",
+          "quantity": "1",
+          "unit_price": "1234"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "98",
+      "gross_total": "1332"
+    }
+  },
+  {
+    "id": "JP-05",
+    "group": "Japan",
+    "title": "Dine-in vs takeaway",
+    "request": {
+      "reference": "JP-05",
+      "currency": "JPY",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "JP",
+        "city": "Tokyo"
+      },
+      "ship_to": {
+        "country": "JP",
+        "city": "Tokyo"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-FOOD-PREP",
+          "quantity": "1",
+          "unit_price": "2000"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "200",
+      "gross_total": "2200"
+    }
+  },
+  {
+    "id": "UK-01",
+    "group": "United Kingdom",
+    "title": "Standard 20%",
+    "request": {
+      "reference": "UK-01",
+      "currency": "GBP",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "GB",
+        "city": "London"
+      },
+      "ship_to": {
+        "country": "GB",
+        "city": "Manchester"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "100.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "20.00",
+      "gross_total": "120.00"
+    }
+  },
+  {
+    "id": "UK-02",
+    "group": "United Kingdom",
+    "title": "Reduced 5%",
+    "request": {
+      "reference": "UK-02",
+      "currency": "GBP",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "GB",
+        "city": "London"
+      },
+      "ship_to": {
+        "country": "GB",
+        "city": "Leeds"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-ENERGY-HOME",
+          "quantity": "1",
+          "unit_price": "100.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "5.00",
+      "gross_total": "105.00"
+    }
+  },
+  {
+    "id": "UK-03",
+    "group": "United Kingdom",
+    "title": "Zero-rated",
+    "request": {
+      "reference": "UK-03",
+      "currency": "GBP",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "GB",
+        "city": "London"
+      },
+      "ship_to": {
+        "country": "GB",
+        "city": "Bristol"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-CLOTH-CHILD",
+          "quantity": "1",
+          "unit_price": "100.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "0.00",
+      "gross_total": "100.00"
+    }
+  },
+  {
+    "id": "UK-04",
+    "group": "United Kingdom",
+    "title": "Three rates on one invoice",
+    "request": {
+      "reference": "UK-04",
+      "currency": "GBP",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "GB",
+        "city": "London"
+      },
+      "ship_to": {
+        "country": "GB",
+        "city": "Leeds"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "100.00"
+        },
+        {
+          "tax_category": "TSG-CLOTH-CHILD",
+          "quantity": "1",
+          "unit_price": "40.00"
+        },
+        {
+          "tax_category": "TSG-ENERGY-HOME",
+          "quantity": "1",
+          "unit_price": "60.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "23.00",
+      "gross_total": "223.00"
+    }
+  },
+  {
+    "id": "UK-05",
+    "group": "United Kingdom",
+    "title": "Inclusive price",
+    "request": {
+      "reference": "UK-05",
+      "currency": "GBP",
+      "prices_include_tax": true,
+      "ship_from": {
+        "country": "GB",
+        "city": "London"
+      },
+      "ship_to": {
+        "country": "GB",
+        "city": "Manchester"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "120.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "20.00",
+      "gross_total": "120.00"
+    }
+  },
+  {
+    "id": "UK-06",
+    "group": "United Kingdom",
+    "title": "Exempt vs zero-rated label",
+    "request": {
+      "reference": "UK-06",
+      "currency": "GBP",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "GB",
+        "city": "London"
+      },
+      "ship_to": {
+        "country": "GB",
+        "city": "London"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-FIN",
+          "quantity": "1",
+          "unit_price": "100.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "0.00",
+      "gross_total": "100.00"
+    }
+  },
+  {
+    "id": "MI-01",
+    "group": "United States",
+    "title": "Michigan statewide rate",
+    "request": {
+      "reference": "MI-01",
+      "currency": "USD",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "US",
+        "region": "MI",
+        "city": "Detroit"
+      },
+      "ship_to": {
+        "country": "US",
+        "city": "Detroit",
+        "region": "MI"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "100.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "6.00",
+      "gross_total": "106.00"
+    }
+  },
+  {
+    "id": "MI-02",
+    "group": "United States",
+    "title": "Michigan grocery exemption",
+    "request": {
+      "reference": "MI-02",
+      "currency": "USD",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "US",
+        "region": "MI",
+        "city": "Detroit"
+      },
+      "ship_to": {
+        "country": "US",
+        "city": "Lansing",
+        "region": "MI"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-FOOD",
+          "quantity": "1",
+          "unit_price": "50.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "0.00",
+      "gross_total": "50.00"
+    }
+  },
+  {
+    "id": "MI-03",
+    "group": "United States",
+    "title": "Michigan mixed basket",
+    "request": {
+      "reference": "MI-03",
+      "currency": "USD",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "US",
+        "region": "MI",
+        "city": "Detroit"
+      },
+      "ship_to": {
+        "country": "US",
+        "city": "Grand Rapids",
+        "region": "MI"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "100.00"
+        },
+        {
+          "tax_category": "TSG-FOOD",
+          "quantity": "1",
+          "unit_price": "50.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "6.00",
+      "gross_total": "156.00"
+    }
+  },
+  {
+    "id": "MI-04",
+    "group": "United States",
+    "title": "Same rate anywhere in Michigan",
+    "request": {
+      "reference": "MI-04",
+      "currency": "USD",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "US",
+        "region": "MI",
+        "city": "Detroit"
+      },
+      "ship_to": {
+        "country": "US",
+        "city": "Marquette",
+        "region": "MI"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "100.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "6.00",
+      "gross_total": "106.00"
+    }
+  },
+  {
+    "id": "IN-01",
+    "group": "United States",
+    "title": "Indiana statewide rate",
+    "request": {
+      "reference": "IN-01",
+      "currency": "USD",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "US",
+        "region": "IN",
+        "city": "Indianapolis"
+      },
+      "ship_to": {
+        "country": "US",
+        "city": "Indianapolis",
+        "region": "IN"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "100.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "7.00",
+      "gross_total": "107.00"
+    }
+  },
+  {
+    "id": "IN-02",
+    "group": "United States",
+    "title": "Indiana resale exemption certificate",
+    "request": {
+      "reference": "IN-02",
+      "currency": "USD",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "US",
+        "region": "IN",
+        "city": "Indianapolis"
+      },
+      "ship_to": {
+        "country": "US",
+        "city": "Fort Wayne",
+        "region": "IN"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "500.00"
+        }
+      ],
+      "customer": {
+        "customer_id": "RESELLER-1",
+        "exemption": "resale"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "0.00",
+      "gross_total": "500.00"
+    }
+  },
+  {
+    "id": "IN-03",
+    "group": "United States",
+    "title": "Indiana prescription exemption",
+    "request": {
+      "reference": "IN-03",
+      "currency": "USD",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "US",
+        "region": "IN",
+        "city": "Indianapolis"
+      },
+      "ship_to": {
+        "country": "US",
+        "city": "Bloomington",
+        "region": "IN"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-MED-RX",
+          "quantity": "1",
+          "unit_price": "80.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "0.00",
+      "gross_total": "80.00"
+    }
+  },
+  {
+    "id": "IN-04",
+    "group": "United States",
+    "title": "Indiana rounding",
+    "request": {
+      "reference": "IN-04",
+      "currency": "USD",
+      "prices_include_tax": false,
+      "ship_from": {
+        "country": "US",
+        "region": "IN",
+        "city": "Indianapolis"
+      },
+      "ship_to": {
+        "country": "US",
+        "city": "Indianapolis",
+        "region": "IN"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "0.99"
+        }
+      ]
+    },
+    "expected": {
+      "status": 200,
+      "tax_total": "0.07",
+      "gross_total": "1.06"
+    }
+  },
+  {
+    "id": "NEG-01",
+    "group": "Negative",
+    "title": "Unsupported country",
+    "request": {
+      "reference": "NEG-01",
+      "currency": "CAD",
+      "ship_from": {
+        "country": "CA",
+        "city": "Toronto"
+      },
+      "ship_to": {
+        "country": "CA",
+        "city": "Toronto",
+        "region": "ON"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "100.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 422,
+      "problem_type": "urn:tsg:problem:unsupported"
+    }
+  },
+  {
+    "id": "NEG-02",
+    "group": "Negative",
+    "title": "Unknown product category",
+    "request": {
+      "reference": "NEG-02",
+      "currency": "AUD",
+      "ship_from": {
+        "country": "AU",
+        "region": "NSW",
+        "city": "Sydney"
+      },
+      "ship_to": {
+        "country": "AU",
+        "city": "Sydney",
+        "region": "NSW"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-UNKNOWN",
+          "quantity": "1",
+          "unit_price": "100.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 422,
+      "problem_type": "urn:tsg:problem:invalid-request"
+    }
+  },
+  {
+    "id": "NEG-03",
+    "group": "Negative",
+    "title": "Negative amount on a sale",
+    "request": {
+      "reference": "NEG-03",
+      "currency": "AUD",
+      "ship_from": {
+        "country": "AU",
+        "region": "NSW",
+        "city": "Sydney"
+      },
+      "ship_to": {
+        "country": "AU",
+        "city": "Sydney",
+        "region": "NSW"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "-10.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 422,
+      "problem_type": "urn:tsg:problem:validation"
+    }
+  },
+  {
+    "id": "NEG-04",
+    "group": "Negative",
+    "title": "Currency mismatch",
+    "request": {
+      "reference": "NEG-04",
+      "currency": "USD",
+      "ship_from": {
+        "country": "AU",
+        "region": "NSW",
+        "city": "Sydney"
+      },
+      "ship_to": {
+        "country": "AU",
+        "city": "Sydney",
+        "region": "NSW"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "100.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 422,
+      "problem_type": "urn:tsg:problem:invalid-request"
+    }
+  },
+  {
+    "id": "NEG-05",
+    "group": "Negative",
+    "title": "Missing ship-to address",
+    "request": {
+      "reference": "NEG-05",
+      "currency": "AUD",
+      "ship_from": {
+        "country": "AU",
+        "region": "NSW",
+        "city": "Sydney"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "100.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 422,
+      "problem_type": "urn:tsg:problem:validation"
+    }
+  },
+  {
+    "id": "NEG-06",
+    "group": "Negative",
+    "title": "US state with local taxes",
+    "request": {
+      "reference": "NEG-06",
+      "currency": "USD",
+      "ship_from": {
+        "country": "US",
+        "region": "CO",
+        "city": "Denver"
+      },
+      "ship_to": {
+        "country": "US",
+        "city": "Denver",
+        "region": "CO"
+      },
+      "lines": [
+        {
+          "tax_category": "TSG-GEN",
+          "quantity": "1",
+          "unit_price": "100.00"
+        }
+      ]
+    },
+    "expected": {
+      "status": 422,
+      "problem_type": "urn:tsg:problem:unsupported"
+    }
+  }
+]
