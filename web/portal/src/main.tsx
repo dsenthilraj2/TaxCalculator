@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
+import { AuthProvider } from 'react-oidc-context'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider } from '@mui/material/styles'
@@ -9,6 +10,8 @@ import '@fontsource/inter/500.css'
 import '@fontsource/inter/600.css'
 import '@fontsource/inter/700.css'
 import { App } from './App'
+import { AuthGate } from './auth/AuthGate'
+import { oidcConfig } from './auth/oidc'
 import { TenantProvider } from './tenant'
 import { theme } from './theme'
 import { ApiError } from './api/client'
@@ -27,11 +30,15 @@ createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme} defaultMode="system">
       <CssBaseline enableColorScheme />
       <QueryClientProvider client={queryClient}>
-        <TenantProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </TenantProvider>
+        <AuthProvider {...oidcConfig}>
+          <AuthGate>
+            <TenantProvider>
+              <BrowserRouter>
+                <App />
+              </BrowserRouter>
+            </TenantProvider>
+          </AuthGate>
+        </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>
   </StrictMode>,

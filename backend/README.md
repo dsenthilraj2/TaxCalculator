@@ -24,10 +24,21 @@ make run      # API on http://127.0.0.1:8000 (docs at /docs)
 | `POST /v1/tax-categories/resolve`, `GET /v1/tax-setup/summary` | Category lookup; setup counts |
 | `POST /v1/tax/calculate`, `GET /v1/tax/jurisdictions` | Sample calculator (TSG rules engine) |
 | `GET /v1/calculations/recent`, `GET /v1/usage/summary` | Recent activity; monthly usage |
-| `GET /v1/dev/tenants`, `GET /v1/dev/scenarios` | Dev only: demo clients; documented test scenarios |
+| `GET /v1/me` | The signed-in caller, their clients and permissions |
+| `GET /v1/dev/scenarios` | Dev only: documented test scenarios |
 | `GET /docs` | Swagger UI (local/test/dev only) |
 
-Client endpoints need the `X-TSG-Tenant` header (local/test/dev only, until OIDC login).
+### Authentication
+
+Client endpoints need `Authorization: Bearer <access token>`. Tokens are verified against the
+OIDC issuer (`TSG_OIDC_ISSUER`, the dev IdP locally): RS256 signature via the issuer's JWKS,
+issuer, audience (`TSG_OIDC_AUDIENCE`) and expiry. Roles and client come from the `roles` and
+`tenant_id` claims (names configurable).
+
+- Client users act for the client in their token. TSG staff (`TsgAdmin`, `TsgAnalyst`) choose
+  one with the `X-TSG-Tenant` header.
+- Changing products, groups or settings needs `ClientAdmin` or `TsgAdmin`.
+- A localhost issuer is refused unless `TSG_APP_ENV` is `local` or `test` (REQ-DEV-2).
 
 Every response carries `X-Correlation-Id` (the caller's value if it's safe, otherwise a new one). Errors are RFC 9457 `application/problem+json` and include `correlationId`.
 

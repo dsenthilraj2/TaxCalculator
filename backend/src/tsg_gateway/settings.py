@@ -2,10 +2,14 @@
 
 from enum import StrEnum
 from functools import lru_cache
+from urllib.parse import urlparse
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from tsg_gateway.observability.logging import LogFormat
+
+_LOCAL_HOSTS = frozenset({"localhost", "127.0.0.1", "::1"})
 
 
 class AppEnv(StrEnum):
@@ -54,8 +58,25 @@ class Settings(BaseSettings):
     mongo_uri: str = "mongodb://127.0.0.1:27017/?replicaSet=rs0&directConnection=true"
     mongo_database: str = "tsg_local"
 
-    # Clients selectable with the X-TSG-Tenant header (local/test/dev only, until OIDC login).
-    dev_tenants: str = "acme,beta"
+    # Known clients. Becomes the tenant catalog once tenant management exists.
+    tenants: str = "acme,beta"
+
+    # OIDC: the dev IdP locally (tools/dev-idp), Entra External ID in the cloud.
+    oidc_issuer: str = "http://127.0.0.1:8081"
+    oidc_audience: str = "tsg-gateway"
+    oidc_roles_claim: str = "roles"
+    oidc_tenant_claim: str = "tenant_id"
+
+    @model_validator(mode="after")
+    def _refuse_local_identity_provider_outside_local(self) -> "Settings":
+        """REQ-DEV-2: the dev IdP must never be trusted by a deployed environment."""
+        host = urlparse(self.oidc_issuer).hostname or ""
+        if self.app_env not in {AppEnv.LOCAL, AppEnv.TEST} and host in _LOCAL_HOSTS:
+            raise ValueError(
+                f"TSG_OIDC_ISSUER points to {host}, which is only allowed when "
+                f"TSG_APP_ENV is local or test (it is {self.app_env.value})."
+            )
+        return self
 
     @property
     def is_non_production(self) -> bool:
@@ -63,9 +84,9 @@ class Settings(BaseSettings):
         return self.app_env in {AppEnv.LOCAL, AppEnv.TEST, AppEnv.DEV}
 
     @property
-    def dev_tenant_ids(self) -> list[str]:
-        """Parsed ``dev_tenants``."""
-        return [tenant.strip() for tenant in self.dev_tenants.split(",") if tenant.strip()]
+    def tenant_ids(self) -> list[str]:
+        """Parsed ``tenants``."""
+        return [tenant.strip() for tenant in self.tenants.split(",") if tenant.strip()]
 
 
 @lru_cache

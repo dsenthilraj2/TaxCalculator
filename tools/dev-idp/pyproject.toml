@@ -1,0 +1,34 @@
+[project]
+name = "tsg-dev-idp"
+version = "0.1.0"
+description = "Local OIDC identity provider for TSG Tax Gateway development. Never deployed."
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "fastapi>=0.115",
+    "pyjwt[crypto]>=2.10",
+    "python-multipart>=0.0.20",
+    "pyyaml>=6.0",
+    "uvicorn>=0.34",
+]
+
+[project.scripts]
+dev-idp = "tsg_dev_idp.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tsg_dev_idp"]
+
+[tool.ruff]
+extend = "../../backend/pyproject.toml"
+src = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "PLR2004", "PLR0913"]

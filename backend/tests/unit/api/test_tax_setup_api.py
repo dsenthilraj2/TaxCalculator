@@ -1,8 +1,7 @@
 import httpx
 import pytest
 
-from tests.unit.api.conftest import ACME, BETA
-from tsg_gateway.entrypoints.api.app import create_app
+from tests.unit.api.conftest import ACME, BETA, build_app
 from tsg_gateway.settings import AppEnv, Settings
 
 AU_SALE = {
@@ -21,24 +20,10 @@ async def test_lists_tsg_categories(client: httpx.AsyncClient) -> None:
     assert len(codes) == 11
 
 
-async def test_tenant_header_is_required(client: httpx.AsyncClient) -> None:
-    response = await client.get("/v1/products")
-
-    assert response.status_code == 401
-    assert "X-TSG-Tenant" in response.json()["detail"]
-
-
-async def test_unknown_tenant_is_forbidden(client: httpx.AsyncClient) -> None:
-    response = await client.get("/v1/products", headers={"X-TSG-Tenant": "mallory"})
-
-    assert response.status_code == 403
-
-
-async def test_dev_tenant_header_rejected_in_production(settings: Settings) -> None:
+async def test_scenarios_hidden_in_production(settings: Settings) -> None:
     prod = settings.model_copy(update={"app_env": AppEnv.PROD})
-    transport = httpx.ASGITransport(app=create_app(prod))
+    transport = httpx.ASGITransport(app=build_app(prod))
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        assert (await client.get("/v1/products", headers=ACME)).status_code == 401
         assert (await client.get("/v1/dev/scenarios")).status_code == 404
 
 

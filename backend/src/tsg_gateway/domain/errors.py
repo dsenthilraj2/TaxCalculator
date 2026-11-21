@@ -27,3 +27,21 @@ class UnsupportedError(TaxGatewayError):
     """The request is valid but outside what this engine or jurisdiction supports."""
 
     code = "unsupported"
+
+
+class AuthenticationError(TaxGatewayError):
+    """No valid credentials (missing, expired, wrong audience, bad signature...)."""
+
+    code = "unauthenticated"
+
+
+class PermissionDeniedError(TaxGatewayError):
+    """Authenticated, but not allowed to do this."""
+
+    code = "forbidden"
+
+
+class DependencyUnavailableError(TaxGatewayError):
+    """A service the gateway depends on (e.g. the identity provider) cannot be reached."""
+
+    code = "dependency-unavailable"

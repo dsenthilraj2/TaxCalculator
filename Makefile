@@ -2,7 +2,7 @@
 BACKEND := backend
 UV := uv --directory $(BACKEND)
 
-.PHONY: help setup sync run seed lint format typecheck arch check test test-cov test-int db db-stop db-docker down clean openapi web-install web web-check demo demo-stop
+.PHONY: help setup sync run idp token seed lint format typecheck arch check test test-cov test-int db db-stop db-docker down clean openapi web-install web web-check demo demo-stop
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-10s %s\n", $$1, $$2}'
@@ -19,16 +19,22 @@ sync: ## Install/update dependencies from uv.lock
 run: ## Run the API locally with reload (http://127.0.0.1:8000/docs)
 	$(UV) run tsg-api
 
+idp: ## Run the dev identity provider (http://127.0.0.1:8081)
+	$(UV) run dev-idp serve
+
+token: ## Print a test access token: make token PERSONA=admin@acme.dev.local
+	@$(UV) run dev-idp token --persona $(or $(PERSONA),admin@acme.dev.local)
+
 seed: db ## Load demo products, group mappings and sample calculations
 	$(UV) run tsg-seed
 
 lint: ## Ruff lint and format check
-	$(UV) run ruff check .
-	$(UV) run ruff format --check .
+	$(UV) run ruff check . ../tools/dev-idp
+	$(UV) run ruff format --check . ../tools/dev-idp
 
 format: ## Auto-fix lint issues and format code
-	$(UV) run ruff check --fix .
-	$(UV) run ruff format .
+	$(UV) run ruff check --fix . ../tools/dev-idp
+	$(UV) run ruff format . ../tools/dev-idp
 
 typecheck: ## mypy (strict)
 	$(UV) run mypy

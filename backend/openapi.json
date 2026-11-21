@@ -89,6 +89,11 @@
         ],
         "summary": "Resolve Tax Category",
         "operationId": "resolve_tax_category_v1_tax_categories_resolve_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "X-TSG-Tenant",
@@ -148,6 +153,11 @@
         ],
         "summary": "Tax Setup Summary",
         "operationId": "tax_setup_summary_v1_tax_setup_summary_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "X-TSG-Tenant",
@@ -197,6 +207,11 @@
         ],
         "summary": "Get Tax Settings",
         "operationId": "get_tax_settings_v1_tax_settings_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "X-TSG-Tenant",
@@ -244,6 +259,11 @@
         ],
         "summary": "Update Tax Settings",
         "operationId": "update_tax_settings_v1_tax_settings_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "X-TSG-Tenant",
@@ -303,6 +323,11 @@
         ],
         "summary": "List Products",
         "operationId": "list_products_v1_products_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "search",
@@ -397,6 +422,11 @@
         ],
         "summary": "Import Products",
         "operationId": "import_products_v1_products_import_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "X-TSG-Tenant",
@@ -461,6 +491,11 @@
         ],
         "summary": "Get Product",
         "operationId": "get_product_v1_products__sku__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "sku",
@@ -517,6 +552,11 @@
         ],
         "summary": "Put Product",
         "operationId": "put_product_v1_products__sku__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "sku",
@@ -583,6 +623,11 @@
         ],
         "summary": "Delete Product",
         "operationId": "delete_product_v1_products__sku__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "sku",
@@ -634,6 +679,11 @@
         ],
         "summary": "List Product Groups",
         "operationId": "list_product_groups_v1_product_groups_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "X-TSG-Tenant",
@@ -687,6 +737,11 @@
         ],
         "summary": "Put Product Group",
         "operationId": "put_product_group_v1_product_groups__group__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "group",
@@ -753,6 +808,11 @@
         ],
         "summary": "Delete Product Group",
         "operationId": "delete_product_group_v1_product_groups__group__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "group",
@@ -829,6 +889,11 @@
         ],
         "summary": "Calculate",
         "operationId": "calculate_v1_tax_calculate_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "X-TSG-Tenant",
@@ -888,6 +953,11 @@
         ],
         "summary": "Recent Calculations",
         "operationId": "recent_calculations_v1_calculations_recent_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "limit",
@@ -953,6 +1023,11 @@
         ],
         "summary": "Usage Summary",
         "operationId": "usage_summary_v1_usage_summary_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "month",
@@ -1012,31 +1087,31 @@
         }
       }
     },
-    "/v1/dev/tenants": {
+    "/v1/me": {
       "get": {
         "tags": [
           "tax",
-          "dev"
+          "identity"
         ],
-        "summary": "Dev Tenants",
-        "description": "Clients selectable in local/test/dev (until OIDC login).",
-        "operationId": "dev_tenants_v1_dev_tenants_get",
+        "summary": "Me",
+        "operationId": "me_v1_me_get",
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "type": "string"
-                  },
-                  "type": "array",
-                  "title": "Response Dev Tenants V1 Dev Tenants Get"
+                  "$ref": "#/components/schemas/Me"
                 }
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
     "/v1/dev/scenarios": {
@@ -1794,6 +1869,82 @@
         "title": "JurisdictionInfo",
         "description": "A jurisdiction an engine can calculate."
       },
+      "Me": {
+        "properties": {
+          "subject": {
+            "type": "string",
+            "title": "Subject"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Roles"
+          },
+          "tenant_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tenant Id"
+          },
+          "is_tsg_staff": {
+            "type": "boolean",
+            "title": "Is Tsg Staff"
+          },
+          "can_edit_setup": {
+            "type": "boolean",
+            "title": "Can Edit Setup"
+          },
+          "tenants": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tenants"
+          }
+        },
+        "type": "object",
+        "required": [
+          "subject",
+          "email",
+          "name",
+          "roles",
+          "tenant_id",
+          "is_tsg_staff",
+          "can_edit_setup",
+          "tenants"
+        ],
+        "title": "Me",
+        "description": "The signed-in caller, the clients they can act for, and what they may do."
+      },
       "Product": {
         "properties": {
           "sku": {
@@ -2245,6 +2396,13 @@
           "type"
         ],
         "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "description": "Access token from the identity provider",
+        "scheme": "bearer"
       }
     }
   }

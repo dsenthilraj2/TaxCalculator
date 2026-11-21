@@ -50,6 +50,7 @@ import {
 import type { ProductView, TaxCategory } from '../api/client'
 import { CategoryChip, ErrorAlert, PageHeader } from '../components/common'
 import { parseProductCsv } from '../format'
+import { useTenant } from '../tenant-context'
 
 type Status = 'all' | 'mapped' | 'unmapped'
 
@@ -61,8 +62,14 @@ export function ProductsPage() {
   const [params, setParams] = useSearchParams()
   const tab = params.get('tab') ?? 'products'
   const summary = useSetupSummary().data
+  const { me } = useTenant()
   return (
     <>
+      {!me.can_edit_setup && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          You have read-only access. Ask a client admin to change products or categories.
+        </Alert>
+      )}
       <PageHeader
         title="Products & tax categories"
         subtitle="Map what you sell to a TSG tax category once. Every calculator uses the same mapping, so you can switch provider any time."
@@ -100,6 +107,7 @@ function ProductsTab() {
   const names = useCategoryNames(categories)
   const products = useProducts({ search, category, status })
   const remove = useDeleteProduct()
+  const canEdit = useTenant().me.can_edit_setup
 
   return (
     <>
@@ -153,12 +161,16 @@ function ProductsTab() {
           <ToggleButton value="unmapped">Using default</ToggleButton>
         </ToggleButtonGroup>
         <Box sx={{ flexGrow: 1 }} />
-        <Button startIcon={<UploadFileOutlined />} onClick={() => setImporting(true)}>
-          Import CSV
-        </Button>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => setEditing('new')}>
-          Add product
-        </Button>
+        {canEdit && (
+          <>
+            <Button startIcon={<UploadFileOutlined />} onClick={() => setImporting(true)}>
+              Import CSV
+            </Button>
+            <Button variant="contained" startIcon={<AddIcon />} onClick={() => setEditing('new')}>
+              Add product
+            </Button>
+          </>
+        )}
       </Stack>
 
       <ErrorAlert error={products.error ?? remove.error} />
@@ -170,7 +182,7 @@ function ProductsTab() {
               <TableCell>Name</TableCell>
               <TableCell>Group</TableCell>
               <TableCell>Tax category</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              {canEdit && <TableCell align="right">Actions</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -193,31 +205,36 @@ function ProductsTab() {
                     names={names}
                   />
                 </TableCell>
-                <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
-                  <Tooltip title="Edit">
-                    <IconButton size="small" onClick={() => setEditing(product)}>
-                      <EditOutlined fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Delete">
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        if (window.confirm(`Delete product ${product.sku}?`)) {
-                          remove.mutate(product.sku)
-                        }
-                      }}
-                    >
-                      <DeleteOutline fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
+                {canEdit && (
+                  <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                    <Tooltip title="Edit">
+                      <IconButton size="small" onClick={() => setEditing(product)}>
+                        <EditOutlined fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete">
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          if (window.confirm(`Delete product ${product.sku}?`)) {
+                            remove.mutate(product.sku)
+                          }
+                        }}
+                      >
+                        <DeleteOutline fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
             {products.data?.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} sx={{ py: 5, textAlign: 'center', color: 'text.secondary' }}>
-                  No products match. Add one, or import a CSV.
+                <TableCell
+                  colSpan={canEdit ? 5 : 4}
+                  sx={{ py: 5, textAlign: 'center', color: 'text.secondary' }}
+                >
+                  No products match.
                 </TableCell>
               </TableRow>
             )}
@@ -411,6 +428,7 @@ function GroupsTab() {
   const products = useProducts({ status: 'all' }).data ?? []
   const save = useSaveGroup()
   const remove = useDeleteGroup()
+  const canEdit = useTenant().me.can_edit_setup
   const [newGroup, setNewGroup] = useState('')
   const [newCategory, setNewCategory] = useState('')
 
@@ -425,58 +443,60 @@ function GroupsTab() {
         group inherits it unless the product sets its own.
       </Typography>
       <ErrorAlert error={groups.error ?? save.error ?? remove.error} />
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 2 }}>
-        <Autocomplete
-          freeSolo
-          options={suggestions}
-          inputValue={newGroup}
-          onInputChange={(_, value) => setNewGroup(value)}
-          sx={{ minWidth: 240 }}
-          renderInput={(inputProps) => (
-            <TextField
-              {...inputProps}
-              size="small"
-              label="Group"
-              helperText={suggestions.length ? `${suggestions.length} unmapped groups found` : ' '}
-            />
-          )}
-        />
-        <TextField
-          select
-          size="small"
-          label="Tax category"
-          value={newCategory}
-          onChange={(e) => setNewCategory(e.target.value)}
-          sx={{ minWidth: 240 }}
-          helperText=" "
-        >
-          {categories.map((c) => (
-            <MenuItem key={c.code} value={c.code}>
-              {c.name} ({c.code})
-            </MenuItem>
-          ))}
-        </TextField>
-        <Box>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            disabled={!newGroup.trim() || !newCategory || save.isPending}
-            onClick={() =>
-              save.mutate(
-                { group: newGroup.trim(), tax_category: newCategory },
-                {
-                  onSuccess: () => {
-                    setNewGroup('')
-                    setNewCategory('')
-                  },
-                },
-              )
-            }
+      {canEdit && (
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 2 }}>
+          <Autocomplete
+            freeSolo
+            options={suggestions}
+            inputValue={newGroup}
+            onInputChange={(_, value) => setNewGroup(value)}
+            sx={{ minWidth: 240 }}
+            renderInput={(inputProps) => (
+              <TextField
+                {...inputProps}
+                size="small"
+                label="Group"
+                helperText={suggestions.length ? `${suggestions.length} unmapped groups found` : ' '}
+              />
+            )}
+          />
+          <TextField
+            select
+            size="small"
+            label="Tax category"
+            value={newCategory}
+            onChange={(e) => setNewCategory(e.target.value)}
+            sx={{ minWidth: 240 }}
+            helperText=" "
           >
-            Map group
-          </Button>
-        </Box>
-      </Stack>
+            {categories.map((c) => (
+              <MenuItem key={c.code} value={c.code}>
+                {c.name} ({c.code})
+              </MenuItem>
+            ))}
+          </TextField>
+          <Box>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              disabled={!newGroup.trim() || !newCategory || save.isPending}
+              onClick={() =>
+                save.mutate(
+                  { group: newGroup.trim(), tax_category: newCategory },
+                  {
+                    onSuccess: () => {
+                      setNewGroup('')
+                      setNewCategory('')
+                    },
+                  },
+                )
+              }
+            >
+              Map group
+            </Button>
+          </Box>
+        </Stack>
+      )}
       <TableContainer>
         <Table size="small">
           <TableHead>
@@ -484,7 +504,7 @@ function GroupsTab() {
               <TableCell>Group</TableCell>
               <TableCell>Tax category</TableCell>
               <TableCell align="right">Products</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              {canEdit && <TableCell align="right">Actions</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -496,6 +516,7 @@ function GroupsTab() {
                     select
                     size="small"
                     variant="standard"
+                    disabled={!canEdit}
                     value={mapping.tax_category}
                     onChange={(e) =>
                       save.mutate({ group: mapping.group, tax_category: e.target.value })
@@ -512,18 +533,23 @@ function GroupsTab() {
                 <TableCell align="right">
                   {products.filter((p) => p.group === mapping.group).length}
                 </TableCell>
-                <TableCell align="right">
-                  <Tooltip title="Remove mapping">
-                    <IconButton size="small" onClick={() => remove.mutate(mapping.group)}>
-                      <DeleteOutline fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
+                {canEdit && (
+                  <TableCell align="right">
+                    <Tooltip title="Remove mapping">
+                      <IconButton size="small" onClick={() => remove.mutate(mapping.group)}>
+                        <DeleteOutline fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
             {groups.data?.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4} sx={{ py: 5, textAlign: 'center', color: 'text.secondary' }}>
+                <TableCell
+                  colSpan={canEdit ? 4 : 3}
+                  sx={{ py: 5, textAlign: 'center', color: 'text.secondary' }}
+                >
                   No group mappings yet.
                 </TableCell>
               </TableRow>
@@ -540,6 +566,7 @@ function SettingsTab() {
   const settings = useTaxSettings()
   const categories = useTaxCategories().data ?? []
   const save = useSaveTaxSettings()
+  const canEdit = useTenant().me.can_edit_setup
   return (
     <Box sx={{ maxWidth: 520 }}>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
@@ -552,6 +579,7 @@ function SettingsTab() {
           select
           fullWidth
           label="Default tax category"
+          disabled={!canEdit}
           value={settings.data.default_category}
           onChange={(e) => save.mutate(e.target.value)}
           helperText={save.isSuccess ? 'Saved.' : ' '}

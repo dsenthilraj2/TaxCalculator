@@ -263,18 +263,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/dev/tenants": {
+    "/v1/me": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /**
-         * Dev Tenants
-         * @description Clients selectable in local/test/dev (until OIDC login).
-         */
-        get: operations["dev_tenants_v1_dev_tenants_get"];
+        /** Me */
+        get: operations["me_v1_me_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -602,6 +599,28 @@ export interface components {
              * @default []
              */
             categories: components["schemas"]["CategoryRate"][];
+        };
+        /**
+         * Me
+         * @description The signed-in caller, the clients they can act for, and what they may do.
+         */
+        Me: {
+            /** Subject */
+            subject: string;
+            /** Email */
+            email: string | null;
+            /** Name */
+            name: string | null;
+            /** Roles */
+            roles: string[];
+            /** Tenant Id */
+            tenant_id: string | null;
+            /** Is Tsg Staff */
+            is_tsg_staff: boolean;
+            /** Can Edit Setup */
+            can_edit_setup: boolean;
+            /** Tenants */
+            tenants: string[];
         };
         /**
          * Product
@@ -1381,7 +1400,7 @@ export interface operations {
             };
         };
     };
-    dev_tenants_v1_dev_tenants_get: {
+    me_v1_me_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -1396,7 +1415,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": string[];
+                    "application/json": components["schemas"]["Me"];
                 };
             };
         };

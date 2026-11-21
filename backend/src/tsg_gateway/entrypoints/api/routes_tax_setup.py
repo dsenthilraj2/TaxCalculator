@@ -9,7 +9,7 @@ from starlette import status
 from tsg_gateway.application.tax_setup import ProductStatus, ProductView, SetupSummary
 from tsg_gateway.domain.products import GroupMapping, Product, ResolvedCategory, TaxSettings
 from tsg_gateway.domain.tax_categories import TaxCategory
-from tsg_gateway.entrypoints.api.dependencies import ServicesDep, TenantDep
+from tsg_gateway.entrypoints.api.dependencies import ServicesDep, SetupWriterDep, TenantDep
 
 router = APIRouter(prefix="/v1", tags=["tax setup"])
 
@@ -83,7 +83,7 @@ async def get_tax_settings(tenant: TenantDep, services: ServicesDep) -> TaxSetti
 
 @router.put("/tax-settings")
 async def update_tax_settings(
-    body: SettingsInput, tenant: TenantDep, services: ServicesDep
+    body: SettingsInput, tenant: SetupWriterDep, services: ServicesDep
 ) -> TaxSettings:
     return await services.tax_setup.update_settings(tenant, body.default_category)
 
@@ -104,7 +104,7 @@ async def list_products(
 @router.post("/products/import")
 async def import_products(
     body: Annotated[list[Product], Body(max_length=5000)],
-    tenant: TenantDep,
+    tenant: SetupWriterDep,
     services: ServicesDep,
 ) -> ImportResult:
     return ImportResult(imported=await services.tax_setup.upsert_products(tenant, body))
@@ -117,13 +117,13 @@ async def get_product(sku: str, tenant: TenantDep, services: ServicesDep) -> Pro
 
 @router.put("/products/{sku}")
 async def put_product(
-    sku: str, body: ProductInput, tenant: TenantDep, services: ServicesDep
+    sku: str, body: ProductInput, tenant: SetupWriterDep, services: ServicesDep
 ) -> ProductView:
     return await services.tax_setup.upsert_product(tenant, Product(sku=sku, **body.model_dump()))
 
 
 @router.delete("/products/{sku}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_product(sku: str, tenant: TenantDep, services: ServicesDep) -> Response:
+async def delete_product(sku: str, tenant: SetupWriterDep, services: ServicesDep) -> Response:
     await services.tax_setup.delete_product(tenant, sku)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -135,12 +135,14 @@ async def list_product_groups(tenant: TenantDep, services: ServicesDep) -> list[
 
 @router.put("/product-groups/{group}")
 async def put_product_group(
-    group: str, body: GroupInput, tenant: TenantDep, services: ServicesDep
+    group: str, body: GroupInput, tenant: SetupWriterDep, services: ServicesDep
 ) -> GroupMapping:
     return await services.tax_setup.upsert_group(tenant, group, body.tax_category)
 
 
 @router.delete("/product-groups/{group}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_product_group(group: str, tenant: TenantDep, services: ServicesDep) -> Response:
+async def delete_product_group(
+    group: str, tenant: SetupWriterDep, services: ServicesDep
+) -> Response:
     await services.tax_setup.delete_group(tenant, group)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

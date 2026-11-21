@@ -9,6 +9,7 @@ dependencies = [
     "httpx>=0.28",
     "pydantic>=2.10",
     "pydantic-settings>=2.7",
+    "pyjwt[crypto]>=2.10",
     "pymongo>=4.11",
     "structlog>=25.1",
     "uvicorn[standard]>=0.34",
@@ -26,8 +27,14 @@ dev = [
     "pytest>=8.3",
     "pytest-asyncio>=0.25",
     "pytest-cov>=6.0",
+    "respx>=0.22",
     "ruff>=0.9",
+    "tsg-dev-idp",
+    "types-pyyaml>=6.0",
 ]
+
+[tool.uv.sources]
+tsg-dev-idp = { path = "../tools/dev-idp", editable = true }
 
 [build-system]
 requires = ["hatchling"]
@@ -59,7 +66,7 @@ known-first-party = ["tsg_gateway"]
 python_version = "3.13"
 strict = true
 mypy_path = "src"
-files = ["src", "tests"]
+files = ["src", "tests", "../tools/dev-idp/src", "../tools/dev-idp/tests"]
 plugins = ["pydantic.mypy"]
 warn_unreachable = true
 
@@ -70,7 +77,7 @@ warn_required_dynamic_aliases = true
 
 # ---------------------------------------------------------------- pytest
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "../tools/dev-idp/tests"]
 addopts = "-ra --strict-markers --strict-config"
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"

@@ -42,8 +42,6 @@ async def test_usage_summary_for_a_past_month_has_every_day(client: httpx.AsyncC
     assert len(summary["by_day"]) == 28
 
 
-async def test_jurisdictions_and_dev_tenants(client: httpx.AsyncClient) -> None:
+async def test_jurisdictions(client: httpx.AsyncClient) -> None:
     jurisdictions = (await client.get("/v1/tax/jurisdictions")).json()
     assert [j["code"] for j in jurisdictions][:2] == ["AU", "NZ"]
-
-    assert (await client.get("/v1/dev/tenants")).json() == ["acme", "beta"]

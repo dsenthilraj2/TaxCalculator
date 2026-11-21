@@ -1,0 +1,61 @@
+# Dev IdP configuration: test users (personas) and OAuth clients.
+# Local development only (spec/10-local-development.md §4). These are test values, not secrets.
+
+issuer: http://127.0.0.1:8081
+audience: tsg-gateway
+token_minutes: 480
+
+clients:
+  - client_id: tsg-portal
+    type: public
+    redirect_uris:
+      - http://127.0.0.1:5173/
+      - http://localhost:5173/
+    post_logout_redirect_uris:
+      - http://127.0.0.1:5173/
+      - http://localhost:5173/
+
+  # Machine-to-machine (ERP -> gateway) using the client credentials grant.
+  - client_id: acme-erp
+    type: confidential
+    client_secret: dev-only-acme-erp-secret
+    tenant_id: acme
+    roles: [Integration]
+
+personas:
+  - email: tsg.admin@dev.local
+    name: TSG Admin
+    roles: [TsgAdmin]
+    tenant_id: "*"
+    note: Global config, every client, can edit
+
+  - email: tsg.analyst@dev.local
+    name: TSG Analyst
+    roles: [TsgAnalyst]
+    tenant_id: "*"
+    note: Every client, read-only
+
+  - email: admin@acme.dev.local
+    name: Alex Acme (admin)
+    roles: [ClientAdmin]
+    tenant_id: acme
+    note: Acme only, can edit setup
+
+  - email: user@acme.dev.local
+    name: Uma Acme (user)
+    roles: [ClientUser]
+    tenant_id: acme
+    note: Acme only, read-only
+
+  - email: admin@beta.dev.local
+    name: Ben Beta (admin)
+    roles: [ClientAdmin]
+    tenant_id: beta
+    note: Beta only. Must never see Acme data
+
+  - email: locked@acme.dev.local
+    name: Lee Locked
+    roles: [ClientUser]
+    tenant_id: acme
+    disabled: true
+    note: Disabled user. Sign-in must be refused

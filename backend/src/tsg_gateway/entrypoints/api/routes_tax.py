@@ -6,13 +6,19 @@ from importlib import resources
 from typing import Annotated, Any
 
 from fastapi import APIRouter, HTTPException, Query
+from pydantic import BaseModel
 from starlette import status
 
 from tsg_gateway.application.calculation import CalculateRequest, CalculateResponse
 from tsg_gateway.application.usage import UsageSummary
 from tsg_gateway.domain.canonical.tax import JurisdictionInfo
 from tsg_gateway.domain.usage import CalculationRecord
-from tsg_gateway.entrypoints.api.dependencies import ServicesDep, SettingsDep, TenantDep
+from tsg_gateway.entrypoints.api.dependencies import (
+    PrincipalDep,
+    ServicesDep,
+    SettingsDep,
+    TenantDep,
+)
 
 router = APIRouter(prefix="/v1", tags=["tax"])
 
@@ -48,11 +54,31 @@ async def usage_summary(
     return await services.usage.month_summary(tenant, month)
 
 
-@router.get("/dev/tenants", tags=["dev"])
-async def dev_tenants(settings: SettingsDep) -> list[str]:
-    """Clients selectable in local/test/dev (until OIDC login)."""
-    _require_non_production(settings.is_non_production)
-    return settings.dev_tenant_ids
+class Me(BaseModel):
+    """The signed-in caller, the clients they can act for, and what they may do."""
+
+    subject: str
+    email: str | None
+    name: str | None
+    roles: list[str]
+    tenant_id: str | None
+    is_tsg_staff: bool
+    can_edit_setup: bool
+    tenants: list[str]
+
+
+@router.get("/me", tags=["identity"])
+async def me(principal: PrincipalDep, settings: SettingsDep) -> Me:
+    return Me(
+        subject=principal.subject,
+        email=principal.email,
+        name=principal.name,
+        roles=sorted(role.value for role in principal.roles),
+        tenant_id=principal.tenant_id,
+        is_tsg_staff=principal.is_tsg_staff,
+        can_edit_setup=principal.can_edit_setup,
+        tenants=principal.accessible_tenants(settings.tenant_ids),
+    )
 
 
 @router.get("/dev/scenarios", tags=["dev"])

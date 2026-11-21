@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import {
   AppBar,
+  Avatar,
   Box,
   Chip,
   Divider,
@@ -11,7 +12,9 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Menu,
   MenuItem,
+  Stack,
   TextField,
   Toolbar,
   Tooltip,
@@ -19,6 +22,9 @@ import {
   useMediaQuery,
 } from '@mui/material'
 import { useColorScheme, useTheme } from '@mui/material/styles'
+import { useAuth } from 'react-oidc-context'
+import { useQueryClient } from '@tanstack/react-query'
+import LogoutOutlined from '@mui/icons-material/LogoutOutlined'
 import DashboardOutlined from '@mui/icons-material/DashboardOutlined'
 import Inventory2Outlined from '@mui/icons-material/Inventory2Outlined'
 import CalculateOutlined from '@mui/icons-material/CalculateOutlined'
@@ -28,7 +34,7 @@ import DarkModeOutlined from '@mui/icons-material/DarkModeOutlined'
 import LightModeOutlined from '@mui/icons-material/LightModeOutlined'
 import ReceiptLongOutlined from '@mui/icons-material/ReceiptLongOutlined'
 import { tenantName, useTenant } from '../tenant-context'
-import { useDevTenants, useHealth } from '../api/hooks'
+import { useHealth } from '../api/hooks'
 
 const DRAWER_WIDTH = 248
 
@@ -110,6 +116,7 @@ export function AppLayout() {
           <Box sx={{ flexGrow: 1 }} />
           <TenantPicker />
           <ColorModeToggle />
+          <UserMenu />
         </Toolbar>
       </AppBar>
 
@@ -133,24 +140,86 @@ export function AppLayout() {
 }
 
 function TenantPicker() {
-  const { tenant, setTenant } = useTenant()
-  const { data: tenants = [tenant] } = useDevTenants()
-  // Development only: choose which client you are acting as (replaced by OIDC login later).
+  const { tenant, setTenant, me } = useTenant()
+  if (!me.is_tsg_staff) {
+    return <Chip label={tenantName(tenant)} variant="outlined" sx={{ fontWeight: 600 }} />
+  }
   return (
     <TextField
       select
       size="small"
-      label="Client (dev only)"
-      value={tenants.includes(tenant) ? tenant : ''}
+      label="Acting for client"
+      value={me.tenants.includes(tenant) ? tenant : ''}
       onChange={(event) => setTenant(event.target.value)}
-      sx={{ minWidth: 180 }}
+      sx={{ minWidth: 190 }}
     >
-      {tenants.map((id) => (
+      {me.tenants.map((id) => (
         <MenuItem key={id} value={id}>
           {tenantName(id)}
         </MenuItem>
       ))}
     </TextField>
+  )
+}
+
+function UserMenu() {
+  const { me } = useTenant()
+  const auth = useAuth()
+  const queryClient = useQueryClient()
+  const [anchor, setAnchor] = useState<HTMLElement | null>(null)
+  const label = me.name ?? me.email ?? me.subject
+  const initials = label
+    .split(/[\s@.]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('')
+
+  const signOut = () => {
+    setAnchor(null)
+    queryClient.clear()
+    void auth.signoutRedirect()
+  }
+
+  return (
+    <>
+      <Tooltip title={label}>
+        <IconButton onClick={(event) => setAnchor(event.currentTarget)} aria-label="Account">
+          <Avatar sx={{ width: 32, height: 32, fontSize: 14, bgcolor: 'primary.main' }}>
+            {initials}
+          </Avatar>
+        </IconButton>
+      </Tooltip>
+      <Menu
+        anchorEl={anchor}
+        open={Boolean(anchor)}
+        onClose={() => setAnchor(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Box sx={{ px: 2, py: 1, minWidth: 240 }}>
+          <Typography variant="subtitle2">{me.name ?? me.subject}</Typography>
+          {me.email && (
+            <Typography variant="body2" color="text.secondary">
+              {me.email}
+            </Typography>
+          )}
+          <Stack direction="row" spacing={0.5} sx={{ mt: 1, flexWrap: 'wrap' }} useFlexGap>
+            {me.roles.map((role) => (
+              <Chip key={role} size="small" label={role} />
+            ))}
+            {!me.can_edit_setup && <Chip size="small" variant="outlined" label="Read-only" />}
+          </Stack>
+        </Box>
+        <Divider />
+        <MenuItem onClick={signOut}>
+          <ListItemIcon>
+            <LogoutOutlined fontSize="small" />
+          </ListItemIcon>
+          Sign out
+        </MenuItem>
+      </Menu>
+    </>
   )
 }
 
@@ -171,6 +240,7 @@ function HealthStatus() {
   const { data, isError } = useHealth()
   const ready = data?.status === 'ready' && !isError
   const database = data?.checks.find((check) => check.name === 'mongodb')
+  const identity = data?.checks.find((check) => check.name === 'identity-provider')
   return (
     <Box sx={{ p: 2 }}>
       <Chip
@@ -186,6 +256,16 @@ function HealthStatus() {
           variant="outlined"
           color={database.ok ? 'success' : 'error'}
           label="MongoDB"
+          sx={{ mr: 1 }}
+        />
+      )}
+      {identity && (
+        <Chip
+          size="small"
+          variant="outlined"
+          color={identity.ok ? 'success' : 'error'}
+          label="Identity"
+          sx={{ mt: 1 }}
         />
       )}
     </Box>

@@ -47,26 +47,39 @@ export class ApiError extends Error {
   }
 }
 
-let currentTenant = ''
+export type Me = Schemas['Me']
 
-/** Called by the tenant context whenever the selected client changes. */
-export function setApiTenant(tenant: string): void {
-  currentTenant = tenant
+/** Fired when the API rejects the access token, so the app can ask the user to sign in. */
+export const UNAUTHORIZED_EVENT = 'tsg:unauthorized'
+
+let accessToken = ''
+let staffTenant = ''
+
+/** Called by the auth gate whenever the signed-in user's token changes. */
+export function setApiToken(token: string): void {
+  accessToken = token
 }
 
-const tenantHeader: Middleware = {
+/** TSG staff choose a client per request; client users act for the client in their token. */
+export function setApiTenant(tenant: string): void {
+  staffTenant = tenant
+}
+
+const authHeaders: Middleware = {
   onRequest({ request }) {
-    if (currentTenant) request.headers.set('X-TSG-Tenant', currentTenant)
+    if (accessToken) request.headers.set('Authorization', `Bearer ${accessToken}`)
+    if (staffTenant) request.headers.set('X-TSG-Tenant', staffTenant)
     return request
   },
 }
 
 export const api = createClient<paths>({ baseUrl: '' })
-api.use(tenantHeader)
+api.use(authHeaders)
 
 /** Unwrap an openapi-fetch result: return data or throw ApiError. */
 export function unwrap<T>(result: { data?: T; error?: unknown; response: Response }): T {
   if (result.error !== undefined || !result.response.ok) {
+    if (result.response.status === 401) window.dispatchEvent(new Event(UNAUTHORIZED_EVENT))
     throw new ApiError(result.response.status, result.error)
   }
   return result.data as T

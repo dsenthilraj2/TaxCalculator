@@ -11,7 +11,13 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from tsg_gateway.bootstrap import Services, build_services
-from tsg_gateway.domain.errors import NotFoundError, TaxGatewayError
+from tsg_gateway.domain.errors import (
+    AuthenticationError,
+    DependencyUnavailableError,
+    NotFoundError,
+    PermissionDeniedError,
+    TaxGatewayError,
+)
 from tsg_gateway.entrypoints.api import routes_tax, routes_tax_setup
 from tsg_gateway.entrypoints.api.health import HEALTH_PATHS, ReadinessCheck, build_health_router
 from tsg_gateway.entrypoints.api.middleware import RequestContextMiddleware
@@ -22,6 +28,13 @@ from tsg_gateway.settings import Settings, get_settings
 logger = get_logger(__name__)
 
 PROBLEM_TYPE_PREFIX = "urn:tsg:problem:"
+
+_ERROR_STATUS: dict[type[TaxGatewayError], HTTPStatus] = {
+    NotFoundError: HTTPStatus.NOT_FOUND,
+    AuthenticationError: HTTPStatus.UNAUTHORIZED,
+    PermissionDeniedError: HTTPStatus.FORBIDDEN,
+    DependencyUnavailableError: HTTPStatus.SERVICE_UNAVAILABLE,
+}
 
 
 def _package_version() -> str:
@@ -69,11 +82,17 @@ def create_app(
 
     @app.exception_handler(TaxGatewayError)
     async def domain_error(_: Request, exc: TaxGatewayError) -> JSONResponse:
-        status_code = HTTPStatus.UNPROCESSABLE_CONTENT
-        if isinstance(exc, NotFoundError):
-            status_code = HTTPStatus.NOT_FOUND
+        status_code = _ERROR_STATUS.get(type(exc), HTTPStatus.UNPROCESSABLE_CONTENT)
+        headers = (
+            {"WWW-Authenticate": 'Bearer error="invalid_token"'}
+            if isinstance(exc, AuthenticationError)
+            else None
+        )
         return problem_response(
-            status_code.value, detail=exc.message, problem_type=PROBLEM_TYPE_PREFIX + exc.code
+            status_code.value,
+            detail=exc.message,
+            problem_type=PROBLEM_TYPE_PREFIX + exc.code,
+            headers=headers,
         )
 
     @app.exception_handler(StarletteHTTPException)

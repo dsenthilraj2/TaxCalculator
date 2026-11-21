@@ -3,8 +3,8 @@ import asyncio
 import httpx
 import pytest
 
+from tests.unit.api.conftest import build_app
 from tsg_gateway.entrypoints.api import health
-from tsg_gateway.entrypoints.api.app import create_app
 from tsg_gateway.entrypoints.api.health import CheckResult
 from tsg_gateway.settings import AppEnv, Settings
 
@@ -41,7 +41,7 @@ async def _database_slow() -> CheckResult:
 
 
 async def _get_ready(settings: Settings, *checks: health.ReadinessCheck) -> httpx.Response:
-    app = create_app(settings, readiness_checks=checks)
+    app = build_app(settings, *checks)
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
         return await client.get("/health/ready")
@@ -76,7 +76,7 @@ async def test_not_ready_when_a_check_times_out(
 
 async def test_docs_hidden_in_prod(settings: Settings) -> None:
     prod = settings.model_copy(update={"app_env": AppEnv.PROD})
-    transport = httpx.ASGITransport(app=create_app(prod))
+    transport = httpx.ASGITransport(app=build_app(prod))
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
         assert (await client.get("/docs")).status_code == 404
         assert (await client.get("/openapi.json")).status_code == 404

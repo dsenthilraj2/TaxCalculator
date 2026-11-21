@@ -16,6 +16,7 @@ def test_defaults_to_local_profile(monkeypatch: pytest.MonkeyPatch) -> None:
 def test_reads_prefixed_environment_variables(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("TSG_APP_ENV", "prod")
     monkeypatch.setenv("TSG_CLOUD", "azure")
+    monkeypatch.setenv("TSG_OIDC_ISSUER", "https://login.example.com")
 
     settings = Settings(_env_file=None)
 

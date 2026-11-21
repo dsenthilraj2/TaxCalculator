@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# One command to run the whole local demo: MongoDB + API + UI.
+# One command to run the whole local demo: MongoDB + dev identity provider + API + UI.
 #
 #   scripts/demo.sh start     start everything (installs/seeds on first run)
 #   scripts/demo.sh stop      stop everything, including MongoDB
@@ -17,8 +17,10 @@ RUN_DIR="$REPO_ROOT/.localdata/run"
 LOG_DIR="$REPO_ROOT/.localdata/logs"
 API_PORT="${API_PORT:-8000}"
 WEB_PORT="${WEB_PORT:-5173}"
+IDP_PORT=8081  # fixed: it is the issuer URL in tools/dev-idp/personas.yaml
 API_URL="http://127.0.0.1:$API_PORT"
 WEB_URL="http://127.0.0.1:$WEB_PORT"
+IDP_URL="http://127.0.0.1:$IDP_PORT"
 
 mkdir -p "$RUN_DIR" "$LOG_DIR"
 
@@ -116,6 +118,10 @@ start() {
     seed
   fi
 
+  say "Starting dev identity provider on port $IDP_PORT"
+  start_service idp "$IDP_PORT" uv --directory "$REPO_ROOT/backend" run dev-idp serve
+  wait_for idp "$IDP_URL/.well-known/openid-configuration"
+
   say "Starting API on port $API_PORT"
   start_service api "$API_PORT" env TSG_PORT="$API_PORT" \
     uv --directory "$REPO_ROOT/backend" run tsg-api
@@ -130,6 +136,7 @@ start() {
   ok "Demo is running"
   echo "    UI:        $WEB_URL"
   echo "    API docs:  $API_URL/docs"
+  echo "    Sign-in:   $IDP_URL (dev identity provider, pick a test user)"
   echo "    Logs:      $LOG_DIR"
   echo "    Stop:      scripts/demo.sh stop"
 }
@@ -138,11 +145,12 @@ stop() {
   say "Stopping demo"
   stop_service web
   stop_service api
+  stop_service idp
   "$REPO_ROOT/scripts/mongodb.sh" stop
 }
 
 status() {
-  for name in api web; do
+  for name in idp api web; do
     if is_running "$name"; then
       ok "$name running (pid $(cat "$RUN_DIR/$name.pid"))"
     else
@@ -157,7 +165,7 @@ case "${1:-}" in
   stop) stop ;;
   restart) stop; start ;;
   status) status ;;
-  logs) tail -n 50 -F "$LOG_DIR/api.log" "$LOG_DIR/web.log" ;;
+  logs) tail -n 50 -F "$LOG_DIR/idp.log" "$LOG_DIR/api.log" "$LOG_DIR/web.log" ;;
   seed) "$REPO_ROOT/scripts/mongodb.sh" start; seed ;;
   *) echo "usage: $0 start|stop|restart|status|logs|seed" >&2; exit 2 ;;
 esac

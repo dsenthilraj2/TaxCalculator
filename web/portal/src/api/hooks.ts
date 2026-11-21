@@ -36,14 +36,6 @@ export function useScenarios() {
   })
 }
 
-export function useDevTenants() {
-  return useQuery({
-    queryKey: ['dev-tenants'],
-    queryFn: async () => unwrap(await api.GET('/v1/dev/tenants')),
-    staleTime: Infinity,
-  })
-}
-
 export function useHealth() {
   return useQuery({
     queryKey: ['health-ready'],
