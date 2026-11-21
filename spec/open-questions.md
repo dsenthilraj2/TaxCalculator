@@ -8,22 +8,22 @@ Fill in **Answer** where you know it. Leave it blank or write "TBC — asking X"
 | ID | Question | Why it matters | Answer |
 |---|---|---|---|
 | Q-01 | What is the product name: Taxcart, TSG Tax Gateway, something else? | Naming in the spec, code and portal | Taxcart |
-| Q-02 ⭐ | Who pays TSG: the merchant (subscription), the provider (partner revenue share), or both? | Decides licensing, metering and billing workflows | Client |
-| Q-03 ⭐ | Whose provider account is used: the **merchant's own** Avalara/Zamp account, or a **TSG master account** that TSG resells? | Decides who owns the filing, how credentials are held, and whether tax reuse (W9) saves TSG money or the merchant's | |
-| Q-04 | Is a licence check per call still needed (as in the MYOB design), or is "tenant active + within quota" enough? | Gateway pipeline step | |
-| Q-05 | Pricing basis: per transaction, per tier, or flat? | Do we need usage metering and quotas? | |
-| Q-06 | Which countries does the MVP cover: US sales tax only, or also UK VAT / EU IOSS / AU GST? | Provider choice (Zamp is US-only) and the data model (VAT numbers, reverse charge) | |
+| Q-02 ⭐ | Who pays TSG: the merchant (subscription), the provider (partner revenue share), or both? | Decides licensing, metering and billing workflows | Merchant / Client |
+| Q-03 ⭐ | Whose provider account is used: the **merchant's own** Avalara/Zamp account, or a **TSG master account** that TSG resells? | Decides who owns the filing, how credentials are held, and whether tax reuse (W9) saves TSG money or the merchant's | Merchant's own for now|
+| Q-04 | Is a licence check per call still needed (as in the MYOB design), or is "tenant active + within quota" enough? | Gateway pipeline step | License call per call is not needed |
+| Q-05 | Pricing basis: per transaction, per tier, or flat? | Do we need usage metering and quotas? | Flat for now. Comparison with usage based would be good for proof |
+| Q-06 | Which countries does the MVP cover: US sales tax only, or also UK VAT / EU IOSS / AU GST? | Provider choice (Zamp is US-only) and the data model (VAT numbers, reverse charge) | USA sales taxes only. Provider would be ZAMP for MVP |
 
 ## B. Source systems & triggers
 
 | ID | Question | Why it matters | Answer |
 |---|---|---|---|
-| Q-10 ⭐ | Which **one or two** source systems are in the MVP? (Cin7 Core? MYOB Acumatica?) | Scope of the first build | |
-| Q-11 ⭐ | Does tax need to be **in the ERP document before it's posted/sent to the customer** (real-time), or can it be filled in afterwards? | Decides trigger modes A/B/C (01-workflow §3) | |
-| Q-12 | For each MVP source: can we install a customisation/plugin (like the MYOB button), does it have webhooks, or polling only? | Connector design | |
-| Q-13 ⭐ | Does the gateway **write the tax back** into the ERP document (lines/total)? Can the ERP API accept an externally calculated tax amount? | Without write-back the gateway is reporting-only | |
-| Q-14 | Which document types per source: quote, sales order, invoice, credit note, POS sale? | W1–W4 coverage | |
-| Q-15 | Which statuses trigger each action (e.g. Cin7 "Authorised" → estimate, "Invoiced" → commit)? | Status mapping config | |
+| Q-10 ⭐ | Which **one or two** source systems are in the MVP? (Cin7 Core? MYOB Acumatica?) | Scope of the first build |CIN7 Omni |
+| Q-11 ⭐ | Does tax need to be **in the ERP document before it's posted/sent to the customer** (real-time), or can it be filled in afterwards? | Decides trigger modes A/B/C (01-workflow §3) | Preferably before posting. Some ERPs have limitations, so will need to handle this based on the ERP |
+| Q-12 | For each MVP source: can we install a customisation/plugin (like the MYOB button), does it have webhooks, or polling only? | Connector design | Needs to be assessed |
+| Q-13 ⭐ | Does the gateway **write the tax back** into the ERP document (lines/total)? Can the ERP API accept an externally calculated tax amount? | Without write-back the gateway is reporting-only | Write back is critical. Some ERPs can accept API imputs for externally calculated amount. |
+| Q-14 | Which document types per source: quote, sales order, invoice, credit note, POS sale? | W1–W4 coverage | Sales Order and Invoices for MVP. Others can follow. POS doesn't normally have such tax calculation complications |
+| Q-15 | Which statuses trigger each action (e.g. Cin7 "Authorised" → estimate, "Invoiced" → commit)? | Status mapping config |Posted. Each ERP has a different action / status. This should be configurable per merchant/client by TSG consultants during onboarding |
 | Q-16 | Where does the item's tax code live? Do merchants already have product tax codes, or do we need a mapping screen (SKU/category → provider tax code)? | W7, and correct calculation | |
 | Q-17 | Is the ship-from address always the warehouse on the line, or can there be drop-ship / multiple warehouses per order? | Line-level ship-from in the model | |
 | Q-18 | Expected volume per tenant (orders/day, peak) and number of tenants in year 1? | Sizing, polling frequency, cost | |
