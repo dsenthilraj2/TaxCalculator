@@ -1,0 +1,7 @@
+# Source documents (proposals, decks) are kept outside version control
+document/
+*.pdf
+*.ppt
+*.pptx
+*.doc
+*.docx
