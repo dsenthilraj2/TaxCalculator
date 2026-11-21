@@ -90,7 +90,20 @@ Fill in **Answer** where you know it. Leave it blank or write "TBC — asking X"
 | Q-78 | How long must detailed engine results be kept (e.g. 7 years for audit, or 90 days detail + aggregates)? | Storage cost | |
 | Q-74 | Which countries/regions should be the first candidates for the TSG engine? (Proposal: AU, NZ, US single-rate states.) | P3 scope | |
 
-## H. Delivery
+## H. Architecture (08-architecture.md)
+
+| ID | Question | Why it matters | Answer |
+|---|---|---|---|
+| Q-80 | Are the proposed NFR targets acceptable (99.9% availability, ≤ 150 ms gateway overhead, 50 req/s)? Do clients need a contractual SLA? | Sizing, redundancy, cost | |
+| Q-81 ⭐ | Which Azure region(s)? Do clients have data residency requirements (e.g. AU data stays in Australia East, US clients in US)? | Deployment topology, possibly one deployment per geography | |
+| Q-82 | Is a single region (zone redundant) enough for the MVP, or is multi-region DR needed from day 1? | Cost and complexity | |
+| Q-83 | Approve the ADRs in 08-architecture §13, especially .NET 10 instead of .NET 8, and App Service + Functions vs Container Apps? | Locks the stack | |
+| Q-84 | Monthly Azure budget per environment for the MVP? | Service tiers (SQL pool size, Redis, Service Bus Premium) | |
+| Q-85 | Is there an existing Azure subscription / Entra tenant at TSG, or do we create new ones? | Setup, billing | |
+| Q-86 | Which ERP plugins must TSG build and host (e.g. an Acumatica customisation package for the Calculate Tax button)? Who maintains them per ERP version? | Connector delivery | |
+| Q-87 | Do we need a public, documented API so third parties or clients can integrate directly (developer portal, SDKs)? | API management, versioning | |
+
+## I. Delivery
 
 | ID | Question | Why it matters | Answer |
 |---|---|---|---|
