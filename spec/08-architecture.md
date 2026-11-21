@@ -141,6 +141,10 @@ TaxCalculator/
     tests/
       unit/  contract/  integration/  e2e/
   web/portal/                   # React + TypeScript SPA
+  tools/                        # local-only, never deployed (10-local-development.md)
+    dev-idp/  provider-sim/  erp-sim/  api-collection/
+  docker-compose.yml            # MongoDB only (+ 'full' profile for demos)
+  Makefile                      # setup · dev · seed · test · check
   infra/terraform/
     modules/                    # cloud-neutral module interfaces
     azure/  aws/                # per-cloud implementations
@@ -190,7 +194,7 @@ We code to the **MongoDB wire protocol**, which is available on every target clo
 | GCP | MongoDB Atlas | Atlas dedicated, or Firestore with MongoDB compatibility |
 | Local / tests | MongoDB in Docker (Testcontainers) | — |
 
-> **REQ-ARC-1** Only MongoDB features supported by **all** of Cosmos DB for MongoDB, DocumentDB and Atlas may be used (a compatibility list is kept in the repo). CI runs the integration tests against real MongoDB and, nightly, against Cosmos DB.
+> **REQ-ARC-1** Only MongoDB features supported by **all** of Cosmos DB for MongoDB, DocumentDB and Atlas may be used (a compatibility list is kept in the repo). CI runs the integration tests against real MongoDB (locally and in CI). An **optional** nightly job runs the same contract suite against Cosmos DB in a dev cloud account. It's never required for developers or PRs.
 > Alternative considered: Cosmos DB NoSQL API (native, slightly cheaper on Azure) → rejected, because it locks the data layer to Azure.
 
 ### 5.3 Tenant isolation: pool first, silo when needed (ADR-9)
@@ -342,7 +346,7 @@ Cost figures are directional. Validate them against current pricing before commi
 
 ### 7.4 Environments
 
-`local` (Docker Compose: MongoDB, Azurite for Blob/Queue, the app) → `dev` → `test` → `prod`. Staging is added at S1. Each environment is a separate resource group (prod in a separate subscription/account), created entirely by Terraform.
+`local` (no cloud: one MongoDB container + local processes, filesystem blob, in-process queue, dev IdP, provider simulator; see [10-local-development.md](10-local-development.md)) → `dev` → `test` → `prod`. Staging is added at S1. Each environment is a separate resource group (prod in a separate subscription/account), created entirely by Terraform.
 
 ## 8. UI architecture (React + TypeScript)
 
@@ -440,7 +444,7 @@ These are mandatory for all backend code. CI enforces them; a PR that fails any 
 | Unit | pytest, pytest-asyncio/anyio, Hypothesis | Domain + application with in-memory adapters | ≥ 90% line coverage on `domain`/`application` |
 | Contract | pytest + **one shared test suite per port**, run against every adapter | Each `DocumentStore`/`MessageBus`/`BlobStore` adapter behaves the same | All adapters pass |
 | Provider/connector | respx (httpx mocking) with recorded sandbox responses | Mapping to and from Avalara/Zamp/Cin7 | Required for every adapter |
-| Integration | **Testcontainers** (MongoDB, Azurite) | Repositories, queues, outbox | On every PR |
+| Integration | **Testcontainers** (MongoDB only) + filesystem blob + in-process/Mongo queue | Repositories, queues, outbox | On every PR |
 | E2E | Playwright (UI) + API tests against `test` env | Key journeys (calculate → commit → portal) | Before prod deploy |
 | Architecture | import-linter, tenant-isolation tests | Layer rules, REQ-ARC-3 | On every PR |
 
