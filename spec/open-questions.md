@@ -7,8 +7,8 @@ Fill in **Answer** where you know it. Leave it blank or write "TBC — asking X"
 
 | ID | Question | Why it matters | Answer |
 |---|---|---|---|
-| Q-01 | What is the product name: Taxcart, TSG Tax Gateway, something else? | Naming in the spec, code and portal | | Taxcart
-| Q-02 ⭐ | Who pays TSG: the merchant (subscription), the provider (partner revenue share), or both? | Decides licensing, metering and billing workflows | |Client
+| Q-01 | What is the product name: Taxcart, TSG Tax Gateway, something else? | Naming in the spec, code and portal | Taxcart |
+| Q-02 ⭐ | Who pays TSG: the merchant (subscription), the provider (partner revenue share), or both? | Decides licensing, metering and billing workflows | Client |
 | Q-03 ⭐ | Whose provider account is used: the **merchant's own** Avalara/Zamp account, or a **TSG master account** that TSG resells? | Decides who owns the filing, how credentials are held, and whether tax reuse (W9) saves TSG money or the merchant's | |
 | Q-04 | Is a licence check per call still needed (as in the MYOB design), or is "tenant active + within quota" enough? | Gateway pipeline step | |
 | Q-05 | Pricing basis: per transaction, per tier, or flat? | Do we need usage metering and quotas? | |
