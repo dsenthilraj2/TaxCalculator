@@ -1,0 +1,32 @@
+# Hooks run the tool versions pinned in backend/uv.lock.
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff check
+        entry: uv --directory backend run ruff check --fix
+        language: system
+        types: [python]
+        files: ^backend/
+        pass_filenames: false
+      - id: ruff-format
+        name: ruff format
+        entry: uv --directory backend run ruff format
+        language: system
+        types: [python]
+        files: ^backend/
+        pass_filenames: false
+      - id: mypy
+        name: mypy
+        entry: uv --directory backend run mypy
+        language: system
+        types: [python]
+        files: ^backend/
+        pass_filenames: false
+      - id: import-linter
+        name: import-linter
+        entry: uv --directory backend run lint-imports
+        language: system
+        types: [python]
+        files: ^backend/
+        pass_filenames: false

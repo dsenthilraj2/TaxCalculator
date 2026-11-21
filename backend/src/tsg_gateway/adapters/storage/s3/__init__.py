@@ -1,0 +1,1 @@
+"""BlobStore adapter: s3."""

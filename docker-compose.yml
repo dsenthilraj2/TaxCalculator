@@ -1,0 +1,16 @@
+# Local stack: MongoDB only. See spec/10-local-development.md.
+services:
+  mongo:
+    image: mongo:8
+    command: ["--replSet", "rs0", "--wiredTigerCacheSizeGB", "0.25", "--bind_ip_all"]
+    ports: ["127.0.0.1:27017:27017"]
+    volumes: ["mongo-data:/data/db"]
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "try{rs.status().ok}catch(e){rs.initiate().ok}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mongo-data:

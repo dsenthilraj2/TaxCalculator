@@ -1,0 +1,1 @@
+"""MessageBus adapter: sqs."""
