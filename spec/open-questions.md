@@ -106,7 +106,17 @@ Fill in **Answer** where you know it. Leave it blank or write "TBC — asking X"
 | Q-89 | Is Cosmos DB for MongoDB on Azure acceptable to start, or would you prefer MongoDB Atlas from day 1 (same everywhere, but a separate vendor bill)? | ADR-3 | |
 | Q-90 | Does the real-time calculation (ERP button) tolerate occasional serverless cold starts in the MVP (a few seconds), or do we pay for always-ready instances from day 1? | S0 vs S1 cost | |
 
-## I. Delivery
+## I. Usage metering & billing (11-usage-metering.md)
+
+| ID | Question | Why it matters | Answer |
+|---|---|---|---|
+| Q-91 | Should clients see **challenger** and TSG-engine call counts, or only requests and who responded? | Client usage screen (links to Q-76) | |
+| Q-92 | Do we need hourly usage granularity, or is daily enough? | Counter storage | |
+| Q-93 | (Later, billing) What is the billable unit: inbound request, document, committed invoice, or line? Are failed, duplicate or challenger calls ever billed? | Billable metric definition | |
+| Q-94 | (Later, billing) Build our own rating/invoicing, or use a billing platform (Stripe Billing, Chargebee, Orb, Lago)? | Build vs buy | |
+| Q-95 | Do we get usage statements from providers (Avalara/Zamp) in a format we can import for reconciliation? | Provider reconciliation screen | |
+
+## J. Delivery
 
 | ID | Question | Why it matters | Answer |
 |---|---|---|---|

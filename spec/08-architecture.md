@@ -232,6 +232,8 @@ The repository layer gets the right database for each tenant from the **catalog*
 | | `idempotency` | `/tenantId` | Idempotency key → stored response | 24–72 h |
 | | `api_calls` | `/tenantId` | External call log (pointer to Blob) | e.g. 90 days → archive |
 | | `audit` | `/tenantId` | Config and admin audit trail | Long retention |
+| | `usage_events` | `/tenantId` | Request + engine call usage events (11-usage-metering.md) | e.g. 13 months → archive |
+| | `usage_counters` | `/tenantId` | Pre-aggregated usage per day × action × engine × role × outcome × country | Long term |
 
 **Document conventions:** `_id` is a ULID (sortable). Fields: `tenantId`, `schemaVersion`, `createdAt`/`updatedAt` (UTC ISO-8601), `etag` for optimistic concurrency. Money is stored as a **string decimal** plus an ISO currency code (e.g. `{"amount": "26.89", "currency": "USD"}`), never as a float.
 

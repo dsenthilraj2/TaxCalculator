@@ -28,6 +28,7 @@ A client can **switch tax provider at any time** without changing their ERP setu
 | [08-architecture.md](08-architecture.md) | Python hexagonal architecture, document DB (MongoDB API), REST → queue evolution, serverless-first multi-cloud roadmap, React UI, Python standards | Draft v0.2 |
 | [09-roadmap.md](09-roadmap.md) | Parallel calculation (primary + challengers), comparison, evidence-based engine choice, phases | Draft v0.2 |
 | [10-local-development.md](10-local-development.md) | Cloud-free local stack (one MongoDB container), dev identity provider with personas, provider/ERP simulators, test levels, seed data | Draft v0.1 |
+| [11-usage-metering.md](11-usage-metering.md) | Requests per client, calls per calculator, who responded, usage screens; billing models kept as roadmap | Draft v0.1 |
 
 ## Conventions
 

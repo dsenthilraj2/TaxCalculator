@@ -135,10 +135,11 @@ The client still chooses **Live** or **Improved** per country ([02-configuration
 
 | Phase | Delivers |
 |---|---|
-| **P1 — Gateway MVP** | Connectors (1–2 ERPs), Avalara + Zamp adapters, W1–W8, portal, country onboarding. **`CalculationRun` stores every primary result from day 1.** |
+| **P1 — Gateway MVP** | Connectors (1–2 ERPs), Avalara + Zamp adapters, W1–W8, portal, country onboarding. **`CalculationRun` stores every primary result from day 1.** **Usage metering** per client and per calculator ([11-usage-metering.md](11-usage-metering.md)). |
 | **P2 — Cache + parallel framework** | Challenger queue, comparison engine, the TSG cache as the first challenger, cache UI, tax change events, evidence dashboard |
 | **P3 — TSG rules engine as challenger** | Rules for flat-rate countries and single-rate states run on every request. Mismatch triage. Optional second-provider sampling. |
 | **P4 — Evidence-based switching** | Confidence scores, promotion board, Improved mode with a TSG primary where proven, automatic fallback |
+| **Billing** (after P2, date TBC) | Billable metrics, price plans (per transaction, allowance + overage, tiers, blocks, subscription, savings share...), push to a billing platform, hard quotas. See [11-usage-metering.md](11-usage-metering.md) §7. |
 | **P5 — Broaden** | More regions and product rules, licensed rate data (Q-45), commits from a TSG primary if approved (Q-71) |
 
 ## 9. Where we expect evidence first
