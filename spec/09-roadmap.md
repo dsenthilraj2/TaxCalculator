@@ -129,7 +129,7 @@ The client still chooses **Live** or **Improved** per country ([02-configuration
 | `EngineConfidence` | Engine, Scope, ProductTaxCode?, Window, SampleSize, MatchRate, LowerBound, WorstDiff, LastMismatchAt |
 | `PrimaryAssignment` | Scope, Engine, EffectiveFrom, ApprovedBy, EvidenceSnapshotId |
 
-*Volume note:* storing every engine's result for every request multiplies storage by the number of engines. Detailed results move to cheaper storage after N days; aggregates stay in SQL (Q-78).
+*Volume note:* storing every engine's result for every request multiplies storage by the number of engines. Detailed results move to Parquet in object storage after N days, and aggregates stay in the document DB (see [08-architecture.md](08-architecture.md) §5.6, Q-78).
 
 ## 8. Roadmap phases
 

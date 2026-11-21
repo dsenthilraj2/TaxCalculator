@@ -25,7 +25,7 @@ A client can **switch tax provider at any time** without changing their ERP setu
 | 05-providers.md | Tax provider adapter contract | Not started |
 | 06-tenancy-security.md | Tenants, users, roles, auth, isolation | Not started |
 | 07-portal-reporting.md | Customer portal and reports | Not started |
-| [08-architecture.md](08-architecture.md) | Stack, code structure, database topology, Azure deployment, UI architecture, security, CI/CD, NFRs | Draft v0.1 |
+| [08-architecture.md](08-architecture.md) | Python hexagonal architecture, document DB (MongoDB API), REST → queue evolution, serverless-first multi-cloud roadmap, React UI, Python standards | Draft v0.2 |
 | [09-roadmap.md](09-roadmap.md) | Parallel calculation (primary + challengers), comparison, evidence-based engine choice, phases | Draft v0.2 |
 
 ## Conventions
